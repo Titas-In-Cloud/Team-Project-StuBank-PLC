@@ -6,12 +6,12 @@ const auth = require("../middleware/auth");
 
 router.post("/register", async(req, res) => {
     try {
-        let {email, password, passwordCheck, personalID, phoneNum} = req.body;
+        let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName} = req.body;
         // validate
-        if(!email || !password || !passwordCheck || !personalID || !phoneNum)
+        if(!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
-        // if(password.length < 8)
-        //     return res.status(400).json({msg: "Password needs to be at least 8 characters long"});
+        if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
+            return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
         if(password !== passwordCheck)
             return res.status(400).json({msg: "Enter password twice to ensure password has been entered correctly"});
         const existingEmail = await User.findOne({email: email});
@@ -57,6 +57,8 @@ router.post("/register", async(req, res) => {
             password: passwordHash,
             personalID,
             phoneNum,
+            firstName,
+            lastName
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
@@ -96,9 +98,12 @@ router.post("/login", async (req, res) => {
         user: {
             id: user._id,
             personalID: user.personalID,
+            email: user.email,
+            phoneNum: user.phoneNum,
+            firstName: user.firstName,
+            lastName: user.lastName
         },
     });
-    console.log("Token: " + token);
 });
 
 router.delete("/delete", auth, async (req, res) => {

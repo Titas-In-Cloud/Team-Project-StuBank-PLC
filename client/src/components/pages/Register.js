@@ -6,6 +6,8 @@ import ErrorNotice from "../misc/ErrorNotice";
 
 export default function Register() {
     const [email, setEmail] = useState();
+    const [firstName, setFirstName] = useState();
+    const [lastName, setLastName] = useState();
     const [password, setPassword] = useState();
     const [passwordCheck, setPasswordCheck] = useState();
     const [personalID, setPersonalID] = useState();
@@ -18,7 +20,7 @@ export default function Register() {
         e.preventDefault();
 
         try {
-            const newUser = { email, password, passwordCheck, personalID, phoneNum };
+            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum };
             await Axios.post("http://localhost:5000/users/register", newUser);
             const loginRes = await Axios.post("http://localhost:5000/users/login", {
                 personalID,
@@ -47,6 +49,19 @@ export default function Register() {
                     id="register-email"
                     type="email"
                     onChange={(e) => setEmail(e.target.value)}
+                />
+                <label htmlFor="register-first-name">First name</label>
+                <input
+                    id="register-first-name"
+                    type="text"
+                    onChange={(e) => setFirstName(e.target.value)}
+                />
+
+                <label htmlFor="register-last-name">Last name</label>
+                <input
+                    id="register-last-name"
+                    type="text"
+                    onChange={(e) => setLastName(e.target.value)}
                 />
 
                 <label htmlFor="register-password">Password</label>
