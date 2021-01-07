@@ -33,6 +33,20 @@ router.post("/register", async(req, res) => {
         if (!(personalID.match(/\d{11}$/)))
             return res.status(400).json({msg: "Please enter exactly 11 digits for the personal ID number"});
 
+        //encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
+        function aesEncrypt(data) {
+            const crypto = require('crypto');
+            const key = crypto.randomBytes(16).toString('hex');
+            const iv = crypto.randomBytes(16);
+            let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+            let encrypted = cipher.update(data);
+            encrypted = Buffer.concat([encrypted, cipher.final()]);
+            return {encryptedData: encrypted.toString('hex'), iv: iv.toString('hex'), key};
+        }
+        /*example of how to use aesEncrypt
+        let example = aesEncrypt('example');
+        let exampleData = example.encryptedData;
+        console.log(example.iv);*/
 
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
@@ -52,6 +66,18 @@ router.post("/register", async(req, res) => {
 
 });
 router.post("/login", async (req, res) => {
+
+    function aesDecrypt(text) {
+        const crypto = require('crypto');
+        const key = req.body.key;
+        const iv = Buffer.from(req.body.iv, 'hex');
+        let encryptedText = Buffer.from(text, 'hex');
+        let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+        let decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return decrypted.toString();
+    }
+
     const {personalID, password} = req.body;
     //validate
     if((!personalID || !password))
