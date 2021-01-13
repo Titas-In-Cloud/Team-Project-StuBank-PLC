@@ -35,6 +35,7 @@ export default function Login() {
             {error && (
                 <ErrorNotice message={error} clearError={() => setError(undefined)} />
             )}
+            {/*Login form*/}
             <form className="form" onSubmit={submit}>
                 <label htmlFor="login-personal-ID">Personal ID</label>
                 <input

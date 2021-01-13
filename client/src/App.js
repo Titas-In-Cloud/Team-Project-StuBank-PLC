@@ -12,6 +12,7 @@ import NavBar from './components/Navbar';
 import Axios from "axios";
 import UserContext from "./context/UserContext";
 import Logout from "./components/pages/Logout";
+import DeletedAccountSuccess from "./components/pages/DeletedAccountSuccess";
 
 export default function App() {
     const [userData, setUserData] = useState({
@@ -60,6 +61,7 @@ export default function App() {
                             <Route path="/login" component={Login}/>
                             <Route path="/register" component={Register}/>
                             <Route path="/logout" component={Logout}/>
+                            <Route path="/deletedAccountPage" component={DeletedAccountSuccess}/>
                         </Switch>
                     </div>
                 </UserContext.Provider>
