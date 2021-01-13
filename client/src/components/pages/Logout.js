@@ -10,8 +10,8 @@ export default function Logout() {
             user: undefined
         })
         localStorage.setItem("auth-token", "")
+        sessionStorage.clear()
     }
-
 
     return (
         <div><h2>Are you sure you wish to logout</h2>
