@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     phoneNum: {type: Map, of: String, required: true, unique: true},
     firstName: {type: Map, of: String, required: true},
     lastName: {type: Map, of: String, required: true},
+    accountBalance: {type: Number, required: true}
 });
 
 module.exports = User = mongoose.model("user", userSchema);

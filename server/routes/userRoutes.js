@@ -16,13 +16,13 @@ router.post("/register", async(req, res) => {
             let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
             let encrypted = cipher.update(data);
             encrypted = Buffer.concat([encrypted, cipher.final()]);
-            return {encryptedData: encrypted.toString('hex'), iv: iv.toString('hex'), key};
+            return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
         }
         function aesDecrypt(data) {
             const crypto = require('crypto');
             const key = String(data.get('key'));
             const iv = Buffer.from(String(data.get('iv')), 'hex');
-            let encryptedText = Buffer.from(String(data.get('encryptedData')), 'hex');
+            let encryptedText = Buffer.from(String(data.get('data')), 'hex');
             let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
             let decrypted = decipher.update(encryptedText);
             decrypted = Buffer.concat([decrypted, decipher.final()]);
@@ -43,9 +43,9 @@ router.post("/register", async(req, res) => {
                 return res.status(400).json({msg: "An account with this email already exists."});
             }
         }
-        const phonenums = await User.find({},{phonenums: 1});
+        const phonenums = await User.find({},{phoneNum: 1});
         for(let item of phonenums){
-            if (aesDecrypt(item.email) === phoneNum){
+            if (aesDecrypt(item.phoneNum) === phoneNum){
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
         }
@@ -68,8 +68,6 @@ router.post("/register", async(req, res) => {
         if (!(personalID.match(/\d{11}$/)))
             return res.status(400).json({msg: "Please enter exactly 11 digits for the personal ID number"});
 
-
-
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
 
@@ -80,11 +78,11 @@ router.post("/register", async(req, res) => {
             phoneNum: aesEncrypt(phoneNum),
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
+            accountBalance: 0.00
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
     } catch(err){
-        console.log(err);
         res.status(500).json({error: err.message} );
     }
 
@@ -99,7 +97,6 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({personalID: personalID});
     if(!user)
         return res.status(400).json({msg: "This user does not exist"});
-    console.log(user);
     const matchTrue = await bcrypt.compare(password, user.password);
     if(!matchTrue)
         return res.status(400).json({msg: "Incorrect password"})
@@ -109,7 +106,7 @@ router.post("/login", async (req, res) => {
         const crypto = require('crypto');
         const key = String(data.get('key'));
         const iv = Buffer.from(String(data.get('iv')), 'hex');
-        let encryptedText = Buffer.from(String(data.get('encryptedData')), 'hex');
+        let encryptedText = Buffer.from(String(data.get('data')), 'hex');
         let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
         let decrypted = decipher.update(encryptedText);
         decrypted = Buffer.concat([decrypted, decipher.final()]);
@@ -124,7 +121,8 @@ router.post("/login", async (req, res) => {
             email: {data: aesDecrypt(user.email)},
             phoneNum: {data: aesDecrypt(user.phoneNum)},
             firstName: {data: aesDecrypt(user.firstName)},
-            lastName: {data: aesDecrypt(user.lastName)}
+            lastName: {data: aesDecrypt(user.lastName)},
+            accountBalance: user.accountBalance
         },
     });
 });
@@ -150,6 +148,33 @@ router.post("/tokenIsValid", async (req, res) =>{
         if(!user)
             return res.json(false);
         return res.json(true);
+    }
+    catch(err) {
+        res.status(500).json({ error: err.message });
+    }
+})
+
+router.post("/transfer", async (req, res) =>{
+    try{
+        const {payerID, payeeID, amount} = req.body
+        if (payerID === payeeID)
+            return res.status(400).json({msg: "This is your account. Please choose another"});
+        if (!(payeeID.match(/^\d{11}$/)))
+            return res.status(400).json({msg: "Please enter exactly 11 digits for the personal ID number"});
+        if (!(amount.match(/^\d+[.]\d{1,2}$/)) && !(amount.match(/^\d+$/)))
+            return res.status(400).json({msg: "Please enter a monetary value"});
+        let payee
+        payee = await User.findOne({personalID: payeeID});
+        if (payee) {payee.accountBalance = (parseFloat(payee.accountBalance) + parseFloat(amount)).toFixed(2)}
+        else{return res.status(400).json({msg: "The payee doesn't exist"})}
+        let payer
+        payer = await User.findOne({personalID: payerID});
+        payer.accountBalance = (parseFloat(payer.accountBalance) - parseFloat(amount)).toFixed(2)
+        if (payer.accountBalance < 0)
+            return res.status(400).json({msg: "Insufficient funds"});
+        payee.save()
+        payer.save()
+        res.json(payer.accountBalance)
     }
     catch(err) {
         res.status(500).json({ error: err.message });
