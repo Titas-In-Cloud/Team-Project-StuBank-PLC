@@ -23,7 +23,7 @@ export default function Login() {
                 token: loginRes.data.token,
                 user: loginRes.data.user,
             });
-            localStorage.setItem("auth-token", loginRes.data.token);
+            sessionStorage.setItem("auth-token", loginRes.data.token);
             sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
             history.push("/");
         } catch (err) {
