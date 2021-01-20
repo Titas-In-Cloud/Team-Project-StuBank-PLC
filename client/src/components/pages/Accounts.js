@@ -62,36 +62,36 @@ export default function Accounts() {
 
     return (
         <>
-        <div>
-            <h2>Accounts</h2>
-            <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
-            Your balance is {user.accountBalance.toFixed(2)}
-            <Button variant={"contained"} disableElevation={true} onClick={() => {setShowTransfer(!showTransfer)}}>Transfer</Button>
-            {showTransfer && (
-                <form className="Form1" onSubmit={submit}>
-                    {error && (
-                        <ErrorNotice message={error} clearError={() => setError(undefined)} />
-                    )}
-                    <label>Payee Personal ID: </label>
-                    <input
-                        type="text"
-                        name="name"
-                        onChange={(e) => setPayeeID(e.target.value)}
-                    />
-                    <label>Amount: </label>
-                    <input
-                        type="text"
-                        name="Amount"
-                        onChange={(e) => setAmount(e.target.value)}
-                    />
-                    <input type="submit" value="Submit"/>
-                </form>)}
-        </div>
-        <div>
-            <br/>
-            <Button variant={"contained"} disableElevation={true} onClick={handleDeleteAccount}>
-                Click here to delete account</Button>
-        </div>
-    </>
+            <div>
+                <h2>Accounts</h2>
+                <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
+                Your balance is {user.accountBalance.toFixed(2)}
+                <Button variant={"contained"} disableElevation={true} onClick={() => {setShowTransfer(!showTransfer)}}>Transfer</Button>
+                {showTransfer && (
+                    <form className="Form1" onSubmit={submit}>
+                        {error && (
+                            <ErrorNotice message={error} clearError={() => setError(undefined)} />
+                        )}
+                        <label>Payee Personal ID: </label>
+                        <input
+                            type="text"
+                            name="name"
+                            onChange={(e) => setPayeeID(e.target.value)}
+                        />
+                        <label>Amount: </label>
+                        <input
+                            type="text"
+                            name="Amount"
+                            onChange={(e) => setAmount(e.target.value)}
+                        />
+                        <input type="submit" value="Submit"/>
+                    </form>)}
+            </div>
+            <div>
+                <br/>
+                <Button variant={"contained"} disableElevation={true} onClick={handleDeleteAccount}>
+                    Click here to delete account</Button>
+            </div>
+        </>
     );
 }

@@ -21,14 +21,16 @@ export default function Navbar() {
         <nav className="Navbar">
             <div className="links" id={showLinks ? "hidden" : ""}>
                 <a href="/">Home</a>
-                <a href="/accounts">Accounts</a>
                 <a href="/features">Features</a>
                 <a href="/about">About Us</a>
                 <a href="/faq">FAQ</a>
 
                 {/*If the user is logged in a logout button is displayed else a register and login button is displayed*/}
                 {userData.user ? (
+                    <>
+                    <a href="/accounts">Accounts</a>
                     <a href="/logout">Log out</a>
+                    </>
                 ) : (
                     <>
                         <a href="/register">Register</a>

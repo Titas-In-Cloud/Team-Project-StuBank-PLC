@@ -10,26 +10,44 @@ export default function Login() {
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
     const history = useHistory();
-
     const submit = async (e) => {
         e.preventDefault();
         try {
             const loginUser = { personalID, password };
+            //Send login data to the server-side and store the response
             const loginRes = await Axios.post(
                 "http://localhost:5000/users/login",
                 loginUser
-            );
-            setUserData({
-                token: loginRes.data.token,
-                user: loginRes.data.user,
-            });
-            localStorage.setItem("auth-token", loginRes.data.token);
-            sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/");
+            )
+
+            let totpToken = prompt("Please enter the google authenticator code: ");
+            //Get the totpSecret from the server-side
+            let totpSecret = loginRes.data.user.totpSecret.base32;
+            const totpData = {
+                "secret": totpSecret,
+                "token": totpToken
+            }
+            //Validate the google authenticator token
+            await Axios.post('http://localhost:5000/users/totp-validate', totpData)
+                .then(res => {
+                    // Set the user data to local and session storage if the token is valid
+                    if (res.data.valid) {
+                        setUserData({
+                            token: loginRes.data.token,
+                            user: loginRes.data.user,
+                        });
+                        localStorage.setItem("auth-token", loginRes.data.token);
+                        sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
+                        history.push("/");
+                    }
+                }
+        );
+
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
-    };
+    }
+
     return (
         <div className="page">
             <h2>Log in</h2>
