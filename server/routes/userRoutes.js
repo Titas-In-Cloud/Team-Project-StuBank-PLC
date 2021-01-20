@@ -79,7 +79,8 @@ router.post("/register", async(req, res) => {
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
             accountBalance: 0.00,
-            recipients: []
+            recipients: [],
+            transactions: []
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
@@ -124,7 +125,8 @@ router.post("/login", async (req, res) => {
             firstName: {data: aesDecrypt(user.firstName)},
             lastName: {data: aesDecrypt(user.lastName)},
             accountBalance: user.accountBalance,
-            recipients: user.recipients
+            recipients: user.recipients,
+            transactions: user.transactions
         },
     });
 });
@@ -169,26 +171,41 @@ router.post("/transfer", async (req, res) =>{
         payee = await User.findOne({personalID: payeeID.value});
         if (payee) {payee.accountBalance = (parseFloat(payee.accountBalance) + parseFloat(amount)).toFixed(2)}
         else{return res.status(400).json({msg: "The payee doesn't exist"})}
+        const date = new Date()
+        payee.transactions.push({date: ("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2)
+            + '-' + date.getFullYear(), amountIn: amount, amountOut: '', account: payerID, balance: payee.accountBalance})
         let payer
         payer = await User.findOne({personalID: payerID});
         payer.accountBalance = (parseFloat(payer.accountBalance) - parseFloat(amount)).toFixed(2)
         if (payer.accountBalance < 0)
             return res.status(400).json({msg: "Insufficient funds"});
+        payer.transactions.push({date: ("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2)
+            + '-' + date.getFullYear(), amountIn: '', amountOut: amount, account: payeeID.value, balance: payer.accountBalance})
         if (payeeID.__isNew__ !== undefined)
             payer.recipients.push({label: payeeID.label, value: payeeID.value})
         payee.save()
         payer.save()
-        res.json(payer.accountBalance)
+        res.json()
     }
     catch(err) {
         res.status(500).json({ error: err.message });
     }
 })
 
-router.post("/updateBalance", async (req, res) =>{
+router.post("/updateData", async (req, res) =>{
     try{
         const {PID} = req.body
-        res.json(await User.findOne({personalID: PID}, {accountBalance: 1}))
+        let userData = await User.findOne({personalID: PID}, {accountBalance: 1, recipients: 1, transactions: 1})
+        for(let transaction of userData.transactions){
+            if(transaction.amountIn !== ''){
+                transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
+            }
+            if(transaction.amountOut !== ''){
+                transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
+            }
+            transaction.balance = '£' + transaction.balance
+        }
+        res.json(userData)
     }
     catch(err){
         res.status(500).json({ error: err.message });

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button} from "@material-ui/core";
+import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import ErrorNotice from "../misc/ErrorNotice";
 import Axios from "axios";
 import CreatableSelect from 'react-select/creatable';
@@ -9,34 +9,39 @@ export default function Accounts() {
     const [amount, setAmount] = useState();
     const [error, setError] = useState();
     const [showTransfer, setShowTransfer] = useState(false)
+    const [showStatement, setShowStatement] = useState(false)
     const [balance, setBalance] = useState(user.accountBalance)
     const [recipient, setRecipient] = useState({label: '', value: ''})
 
-    useEffect(() => {
-        async function newBalance(){
-            try{
-                const newBalance = await Axios.post("http://localhost:5000/users/updateBalance", {PID: user.personalID})
-                setBalance(newBalance.data.accountBalance)
-                setShowTransfer(false)
-                user.accountBalance = balance
-                sessionStorage.setItem("userData", JSON.stringify(user))
-            }
-            catch(err){
-                err.response.data.msg && setError(err.response.data.msg)
-            }
+    async function updateData(){
+        try{
+            const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: user.personalID})
+            user.accountBalance = newData.data.accountBalance
+            user.recipients = newData.data.recipients
+            user.transactions = newData.data.transactions
+            setBalance(user.accountBalance)
+            setShowTransfer(false)
+            setShowStatement(false)
+            setRecipient({label: '', value: ''})
+            setAmount('')
+            sessionStorage.setItem("userData", JSON.stringify(user))
         }
-        newBalance();
+        catch(err){
+            console.log(err)
+            err.response.data.msg && setError(err.response.data.msg)
+        }
+    }
+
+    useEffect(() => {
+        updateData();
     }, []);
 
     async function submit(e){
         e.preventDefault();
         try {
             const data ={payerID: user.personalID, payeeID: recipient, amount}
-            const newBalance = await Axios.post("http://localhost:5000/users/transfer", data)
-            setBalance(newBalance.data)
-            setShowTransfer(false)
-            user.accountBalance = newBalance.data
-            sessionStorage.setItem("userData", JSON.stringify(user))
+            await Axios.post("http://localhost:5000/users/transfer", data)
+            await updateData()
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }
@@ -50,7 +55,7 @@ export default function Accounts() {
         <div>
             <h2>Accounts</h2>
             <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
-            Your balance is {balance.toFixed(2)}
+            Your balance is £{balance.toFixed(2)}
             <div>
                 <Button variant={"contained"} disableElevation={true} onClick={() => {setShowTransfer(!showTransfer)}}>Transfer</Button>
             </div>
@@ -70,6 +75,36 @@ export default function Accounts() {
                 />
                 <input type="submit" value="Submit"/>
             </form>)}
+            <div>
+                <Button variant={"contained"} disableElevation={true} onClick={() => {setShowStatement(!showStatement)}}>Show Statement</Button>
+            </div>
+            {showStatement &&
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Amount In</TableCell>
+                            <TableCell>Amount Out</TableCell>
+                            <TableCell>Account</TableCell>
+                            <TableCell>Balance</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {user.transactions.map((transaction) => (
+                            <TableRow key={transaction.date}>
+                                <TableCell component="th" scope="row">
+                                    {transaction.date}
+                                </TableCell>
+                                <TableCell>{transaction.amountIn}</TableCell>
+                                <TableCell>{transaction.amountOut}</TableCell>
+                                <TableCell>{transaction.account}</TableCell>
+                                <TableCell>{transaction.balance}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>}
         </div>
     );
 }
