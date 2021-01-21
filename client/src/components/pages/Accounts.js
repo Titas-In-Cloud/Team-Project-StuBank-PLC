@@ -55,7 +55,7 @@ export default function Accounts() {
         <div>
             <h2>Accounts</h2>
             <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
-            Your balance is £{balance.toFixed(2)}
+            Your balance is £{Number(balance).toFixed(2)}
             <div>
                 <Button variant={"contained"} disableElevation={true} onClick={() => {setShowTransfer(!showTransfer)}}>Transfer</Button>
             </div>
