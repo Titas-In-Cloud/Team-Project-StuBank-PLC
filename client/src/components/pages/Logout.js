@@ -9,7 +9,6 @@ export default function Logout() {
             token: undefined,
             user: undefined
         })
-        localStorage.setItem("auth-token", "")
         sessionStorage.clear()
     }
 
