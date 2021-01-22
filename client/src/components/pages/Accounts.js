@@ -52,6 +52,7 @@ export default function Accounts() {
     };
 
     return (
+        <>
         <div>
             <h2>Accounts</h2>
             <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
@@ -106,5 +107,6 @@ export default function Accounts() {
                 </Table>
             </TableContainer>}
         </div>
+    </>
     );
 }
