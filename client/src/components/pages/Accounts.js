@@ -63,8 +63,7 @@ export default function Accounts() {
         localStorage.setItem("auth-token", "")
     }
 
-    async function submit(e){
-        e.preventDefault();
+    async function handleDeleteAccount() {
         try {
             //Gets auth token from local storage and saves to a variable
             const token = localStorage.getItem('auth-token');
@@ -84,9 +83,16 @@ export default function Accounts() {
         }
     }
 
-    const recipientChange = (input) => {
-        setRecipient(input)
-    };
+    async function submit(e) {
+        e.preventDefault();
+        try {
+            const data = {payerID: user.personalID, payeeID: recipient, amount}
+            await Axios.post("http://localhost:5000/users/transfer", data)
+            await updateData()
+        } catch (err) {
+            err.response.data.msg && setError(err.response.data.msg)
+        }
+    }
 
     return (
         <>
