@@ -26,6 +26,27 @@ function aesDecrypt(data) {
     return decrypted.toString();
 }
 
+//encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
+function aesEncrypt(data) {
+    const crypto = require('crypto');
+    const key = crypto.randomBytes(16).toString('hex');
+    const iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+    let encrypted = cipher.update(data);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
+}
+function aesDecrypt(data) {
+    const crypto = require('crypto');
+    const key = String(data.get('key'));
+    const iv = Buffer.from(String(data.get('iv')), 'hex');
+    let encryptedText = Buffer.from(String(data.get('data')), 'hex');
+    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+}
+
 router.post("/register", async(req, res) => {
     try {
         let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName} = req.body;

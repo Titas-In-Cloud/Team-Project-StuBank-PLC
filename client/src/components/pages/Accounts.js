@@ -63,7 +63,8 @@ export default function Accounts() {
         localStorage.setItem("auth-token", "")
     }
 
-    async function handleDeleteAccount() {
+    async function submit(e){
+        e.preventDefault();
         try {
             //Gets auth token from local storage and saves to a variable
             const token = localStorage.getItem('auth-token');
@@ -82,6 +83,10 @@ export default function Accounts() {
             console.log(err);
         }
     }
+
+    const recipientChange = (input) => {
+        setRecipient(input)
+    };
 
     return (
         <>
