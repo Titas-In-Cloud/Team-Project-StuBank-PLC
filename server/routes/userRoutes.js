@@ -3,6 +3,28 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
+const speakeasy = require("speakeasy");
+
+//encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
+function aesEncrypt(data) {
+    const crypto = require('crypto');
+    const key = crypto.randomBytes(16).toString('hex');
+    const iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+    let encrypted = cipher.update(data);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
+}
+function aesDecrypt(data) {
+    const crypto = require('crypto');
+    const key = String(data.get('key'));
+    const iv = Buffer.from(String(data.get('iv')), 'hex');
+    let encryptedText = Buffer.from(String(data.get('data')), 'hex');
+    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+}
 
 //encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
 function aesEncrypt(data) {
@@ -70,6 +92,11 @@ router.post("/register", async(req, res) => {
 
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
+
+        let totpSecret = speakeasy.generateSecret({
+            name: "StuBank Plc"
+        });
+
         const newUser = new User({
             email: aesEncrypt(email),
             password: passwordHash,
@@ -78,6 +105,7 @@ router.post("/register", async(req, res) => {
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
             accountBalance: aesEncrypt('50'),
+            totpSecret: aesEncrypt(JSON.stringify(totpSecret))
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
@@ -126,7 +154,8 @@ router.post("/login", async (req, res) => {
             lastName: {data: aesDecrypt(user.lastName)},
             accountBalance: {data: aesDecrypt(user.accountBalance)},
             recipients: user.recipients,
-            transactions: user.transactions
+            transactions: user.transactions,
+            totpSecret: JSON.parse(aesDecrypt(user.totpSecret))
         },
     });
 });
@@ -174,7 +203,7 @@ router.post("/transfer", async (req, res) =>{
         else{return res.status(400).json({msg: "The payee doesn't exist"})}
         const date = new Date()
         payee.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
+                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
             amountOut: aesEncrypt(''), account: payerID, balance: payee.accountBalance})
         let payer
         payer = await User.findOne({personalID: payerID});
@@ -183,7 +212,7 @@ router.post("/transfer", async (req, res) =>{
         if (payer.accountBalance < 0)
             return res.status(400).json({msg: "Insufficient funds"});
         payer.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
+                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
             amountOut: aesEncrypt(amount), account: payeeID.value, balance: payer.accountBalance})
         if (payeeID.__isNew__ !== undefined)
             payer.recipients.push({label: payeeID.label, value: payeeID.value})
@@ -220,11 +249,28 @@ router.post("/updateData", async (req, res) =>{
     }
 })
 router.get("/", auth, async (req, res) => {
-   const user = await User.findById(req.user);
-   res.json({
-       personalID: user.personalID,
-       id: user._id,
-   });
+    const user = await User.findById(req.user);
+    res.json({
+        personalID: user.personalID,
+        id: user._id,
+    });
+});
+
+router.post("/totp-validate", (request, response, next) => {
+    // Check user 2FA code is valid and correct
+    let verified = speakeasy.totp.verify({
+        secret: request.body.secret,
+        encoding: 'base32',
+        token: request.body.token
+    })
+    // if 2FA code is correct return this to the client side
+    if (verified) {
+        response.send({"valid": verified});
+    }
+    //If 2FA is not valid then set an error message
+    else {
+        return response.status(400).json({msg: "2FA Failed: incorrect google authenticator code"});
+    }
 });
 
 

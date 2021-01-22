@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     lastName: {type: Map, of: String, required: true},
     accountBalance: {type: Map, of: String, required: true},
     recipients: {type: [Map], of: String, required: true},
-    transactions: {type: [Object], required: true}
+    transactions: {type: [Object], required: true},
+    totpSecret: {type: Map, of: String, required: true}
 });
 
 module.exports = User = mongoose.model("user", userSchema);

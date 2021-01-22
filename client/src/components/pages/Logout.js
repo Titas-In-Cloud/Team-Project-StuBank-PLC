@@ -4,6 +4,7 @@ import {Button} from "@material-ui/core";
 
 export default function Logout() {
     const {userData, setUserData} = useContext(UserContext);
+    // This removes the authentication token from the user data and also the local storage when the user logs out
     const logout = () => {
         setUserData({
             token: undefined,
