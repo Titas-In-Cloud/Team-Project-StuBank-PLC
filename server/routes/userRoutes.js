@@ -26,25 +26,35 @@ function aesDecrypt(data) {
     return decrypted.toString();
 }
 
-//encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
-function aesEncrypt(data) {
-    const crypto = require('crypto');
-    const key = crypto.randomBytes(16).toString('hex');
-    const iv = crypto.randomBytes(16);
-    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
-    let encrypted = cipher.update(data);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
-}
-function aesDecrypt(data) {
-    const crypto = require('crypto');
-    const key = String(data.get('key'));
-    const iv = Buffer.from(String(data.get('iv')), 'hex');
-    let encryptedText = Buffer.from(String(data.get('data')), 'hex');
-    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
+async function getUserData(PID){
+    let userData = await User.findOne({personalID: PID})
+    for(let transaction of userData.transactions){
+        transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
+        transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
+        transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
+        transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
+        if(transaction.amountIn !== ''){
+            transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
+        }
+        if(transaction.amountOut !== ''){
+            transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
+        }
+        transaction.balance = '£' + transaction.balance
+    }
+    return {
+        user: {
+            id: userData._id,
+            personalID: userData.personalID,
+            email: {data: aesDecrypt(userData.email)},
+            phoneNum: {data: aesDecrypt(userData.phoneNum)},
+            firstName: {data: aesDecrypt(userData.firstName)},
+            lastName: {data: aesDecrypt(userData.lastName)},
+            accountBalance: {data: aesDecrypt(userData.accountBalance)},
+            recipients: userData.recipients,
+            transactions: userData.transactions,
+            totpSecret: JSON.parse(aesDecrypt(userData.totpSecret))
+        }
+    }
 }
 
 router.post("/register", async(req, res) => {
@@ -129,34 +139,10 @@ router.post("/login", async (req, res) => {
         return res.status(400).json({msg: "Incorrect password"})
     const token = jwt.sign({id: user._id}, process.env.JWT_PWD)
 
-    for(let transaction of user.transactions){
-        transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
-        transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
-        transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
-        transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
-        if(transaction.amountIn !== ''){
-            transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
-        }
-        if(transaction.amountOut !== ''){
-            transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
-        }
-        transaction.balance = '£' + transaction.balance
-    }
-
+    const userData = await getUserData(personalID)
     res.json({
         token,
-        user: {
-            id: user._id,
-            personalID: user.personalID,
-            email: {data: aesDecrypt(user.email)},
-            phoneNum: {data: aesDecrypt(user.phoneNum)},
-            firstName: {data: aesDecrypt(user.firstName)},
-            lastName: {data: aesDecrypt(user.lastName)},
-            accountBalance: {data: aesDecrypt(user.accountBalance)},
-            recipients: user.recipients,
-            transactions: user.transactions,
-            totpSecret: JSON.parse(aesDecrypt(user.totpSecret))
-        },
+        user: userData.user
     });
 });
 
@@ -228,21 +214,8 @@ router.post("/transfer", async (req, res) =>{
 router.post("/updateData", async (req, res) =>{
     try{
         const {PID} = req.body
-        let userData = await User.findOne({personalID: PID}, {accountBalance: 1, recipients: 1, transactions: 1})
-        for(let transaction of userData.transactions){
-            transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
-            transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
-            transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
-            transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
-            if(transaction.amountIn !== ''){
-                transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
-            }
-            if(transaction.amountOut !== ''){
-                transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
-            }
-            transaction.balance = '£' + transaction.balance
-        }
-        res.json({accountBalance: aesDecrypt(userData.accountBalance), recipients: userData.recipients, transactions: userData.transactions})
+        const newData = await getUserData(PID)
+        res.json(newData.user)
     }
     catch(err){
         res.status(500).json({ error: err.message });
@@ -273,5 +246,56 @@ router.post("/totp-validate", (request, response, next) => {
     }
 });
 
+router.post("/amendDetails", async (req, res) =>{
+    try{
+        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID} = req.body;
+        let oldUser
+        oldUser = await User.findOne({personalID})
+        // validate
+        if(!email || !phoneNum || !firstName || !lastName)
+            return res.status(400).json({msg: "One or more required fields are blank"});
+        if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
+            return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
+        if (!(email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)))
+            return res.status(400).json({msg: "Email address is not valid, please enter a valid email, e.g. example@email.com"});
+
+        const emails = await User.find({},{email: 1});
+        for(let item of emails){
+            if (aesDecrypt(item.email) === email && email !== aesDecrypt(oldUser.email)){
+                return res.status(400).json({msg: "An account with this email already exists."});
+            }
+        }
+
+        const phonenums = await User.find({},{phoneNum: 1});
+        for(let item of phonenums) {
+            if (aesDecrypt(item.phoneNum) === phoneNum && phoneNum !== aesDecrypt(oldUser.phoneNum)) {
+                return res.status(400).json({msg: "An account with this phone number already exists."});
+            }
+        }
+
+        if (passwordOld || passwordNew || passwordCheck) {
+            const matchTrue = await bcrypt.compare(passwordOld, oldUser.password);
+            if(!matchTrue)
+                return res.status(400).json({msg: "Incorrect current password"})
+            if (passwordNew !== passwordCheck)
+                return res.status(400).json({msg: "Enter new password twice to ensure new password has been entered correctly"});
+            if (!(passwordNew.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
+                return res.status(400).json({msg: "New password is not valid"});
+
+            const salt = await bcrypt.genSalt();
+            oldUser.password = await bcrypt.hash(passwordNew, salt);
+        }
+
+        oldUser.email = aesEncrypt(email)
+        oldUser.firstName = aesEncrypt(firstName)
+        oldUser.lastName = aesEncrypt(lastName)
+        oldUser.phoneNum = aesEncrypt(phoneNum)
+        await oldUser.save()
+        res.json()
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
 
 module.exports = router;
