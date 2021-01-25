@@ -12,3 +12,7 @@ export { default as Account } from "./main/pages/Account";
 export { default as Cards } from "./main/pages/Cards";
 export { default as Settings } from "./main/pages/Settings";
 export { default as MainNavigationBar } from "./main/NavigationBar";
+
+export { default as Users } from "./admin/pages/Users";
+export { default as NewAdmin } from "./admin/pages/NewAdmin";
+export { default as AdminNavigationBar } from "./admin/NavigationBar";
