@@ -87,12 +87,6 @@ export default function Register () {
                                 <img src={EmailLogo} alt=""/>
                             </div>
 
-
-                            <div className="inputBox">
-                                <input type="text" placeholder="Username"/>
-                                <img src={UserLogo} alt=""/>
-                            </div>
-
                             <label htmlFor="register-personal-id"/>
                             <div className="inputBox">
                                 <input type="text" placeholder="User ID" id="register-password"
