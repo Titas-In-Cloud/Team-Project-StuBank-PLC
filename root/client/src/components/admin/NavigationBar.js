@@ -45,7 +45,7 @@ function NavigationBar(){
                     </li>
                 </ul>
                 <div className="text">
-                    <h2 className="admin">Admin ID: {user.personalID}</h2>
+                    {/*<h2 className="admin">Admin ID: {user.personalID}</h2>*/}
                 </div>
             </div>
             <div className="button">
