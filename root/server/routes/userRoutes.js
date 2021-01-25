@@ -26,6 +26,36 @@ function aesDecrypt(data) {
     return decrypted.toString();
 }
 
+async function getUserData(PID){
+    let userData = await User.findOne({personalID: PID})
+    for(let transaction of userData.transactions){
+        transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
+        transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
+        transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
+        transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
+        if(transaction.amountIn !== ''){
+            transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
+        }
+        if(transaction.amountOut !== ''){
+            transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
+        }
+        transaction.balance = '£' + transaction.balance
+    }
+    return {
+        user: {
+            id: userData._id,
+            personalID: userData.personalID,
+            email: {data: aesDecrypt(userData.email)},
+            phoneNum: {data: aesDecrypt(userData.phoneNum)},
+            firstName: {data: aesDecrypt(userData.firstName)},
+            lastName: {data: aesDecrypt(userData.lastName)},
+            accountBalance: {data: aesDecrypt(userData.accountBalance)},
+            recipients: userData.recipients,
+            transactions: userData.transactions,
+            totpSecret: JSON.parse(aesDecrypt(userData.totpSecret))
+        }
+    }
+}
 router.post("/register", async(req, res) => {
     try {
         let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName} = req.body;
@@ -107,33 +137,11 @@ router.post("/login", async (req, res) => {
         if (!matchTrue)
             return res.status(400).json({msg: "Incorrect password"})
         const token = jwt.sign({id: user._id}, process.env.JWT_PWD)
-        for (let transaction of user.transactions) {
-            transaction.date = aesDecrypt(new Map([['data', transaction.date.data], ['iv', transaction.date.iv], ['key', transaction.date.key]]))
-            transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data], ['iv', transaction.amountIn.iv], ['key', transaction.amountIn.key]]))
-            transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data], ['iv', transaction.amountOut.iv], ['key', transaction.amountOut.key]]))
-            transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data], ['iv', transaction.balance.iv], ['key', transaction.balance.key]]))
-            if (transaction.amountIn !== '') {
-                transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
-            }
-            if (transaction.amountOut !== '') {
-                transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
-            }
-            transaction.balance = '£' + transaction.balance
-        }
+
+        const userData = await getUserData(personalID)
         res.json({
             token,
-            user: {
-                id: user._id,
-                personalID: user.personalID,
-                email: {data: aesDecrypt(user.email)},
-                phoneNum: {data: aesDecrypt(user.phoneNum)},
-                firstName: {data: aesDecrypt(user.firstName)},
-                lastName: {data: aesDecrypt(user.lastName)},
-                accountBalance: {data: aesDecrypt(user.accountBalance)},
-                recipients: user.recipients,
-                transactions: user.transactions,
-                totpSecret: JSON.parse(aesDecrypt(user.totpSecret))
-            },
+            user: userData.user
         });
     }
     catch(err){
@@ -209,21 +217,8 @@ router.post("/transfer", async (req, res) =>{
 router.post("/updateData", async (req, res) =>{
     try{
         const {PID} = req.body
-        let userData = await User.findOne({personalID: PID}, {accountBalance: 1, recipients: 1, transactions: 1})
-        for(let transaction of userData.transactions){
-            transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
-            transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
-            transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
-            transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
-            if(transaction.amountIn !== ''){
-                transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
-            }
-            if(transaction.amountOut !== ''){
-                transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
-            }
-            transaction.balance = '£' + transaction.balance
-        }
-        res.json({accountBalance: aesDecrypt(userData.accountBalance), recipients: userData.recipients, transactions: userData.transactions})
+        const newData = await getUserData(PID)
+        res.json(newData.user)
     }
     catch(err){
         res.status(500).json({ error: err.message });
