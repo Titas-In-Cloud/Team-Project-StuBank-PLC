@@ -261,6 +261,14 @@ nav.home-nav{
     color: #b5b4b4;
     font-size: 1.8rem;
 }
+
+.sidebar .text h2.admin{
+    position: absolute;
+    padding-left: 20px;
+    bottom: 10px;
+    color: #f1f1f1;
+    font-size: 1.8rem;
+}
 /*top navigation bar on main page*/
 .top-bar{
     position: absolute;
@@ -316,6 +324,38 @@ nav.home-nav{
     height: 100vh;
     color: #b0b0b0;
 }
+.main-background .big-bank-box{
+    position: relative;
+    left: 27rem;
+    top: 12rem;
+    width: 172vh;
+    height: 85vh;
+    background: rgba(253, 253, 253, 1);
+    border: 2px solid #ffffff;
+    border-radius: 1.2rem;
+    box-shadow: 0 5px 35px rgba(102, 102, 102, 0.2);
+}
+.main-background .small-bank-box{
+    position: relative;
+    left: 78rem;
+    top: 12rem;
+    width: 60vh;
+    height: 70vh;
+    background: rgba(253, 253, 253, 1);
+    border: 2px solid #ffffff;
+    border-radius: 1.2rem;
+    box-shadow: 0 5px 35px rgba(102, 102, 102, 0.2);
+}
+
+.main-background h1{
+    position: center;
+    padding-top: 10px;
+    padding-left: 10px;
+    color: #151515;
+    font-size: 3rem;
+    font-family: 'Aldrich', sans-serif;
+}
+
 /*testing*/
 .default {
     width: 100%;

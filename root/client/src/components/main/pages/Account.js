@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice"
 import Axios from "axios";
@@ -9,9 +9,9 @@ export default function Account () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
     const [amount, setAmount] = useState();
     const [errorTransfer, setErrorTransfer] = useState();
-    const [showTransfer, setShowTransfer] = useState(false)
-    const [balance, setBalance] = useState(user.accountBalance)
-    const [recipient, setRecipient] = useState({label: '', value: ''})
+    const [showTransfer, setShowTransfer] = useState(false);
+    const [balance, setBalance] = useState(user.accountBalance);
+    const [recipient, setRecipient] = useState({label: '', value: ''});
 
     async function updateData() {
         try {

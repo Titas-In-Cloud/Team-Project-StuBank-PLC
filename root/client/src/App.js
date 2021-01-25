@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import { Home, Features, AboutUs, FAQ, Login, Register } from "./components";
 import { Overview, Transactions, Account, Cards, Settings } from "./components";
+import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
 import Axios from "axios";
 
@@ -52,6 +53,8 @@ export default function App() {
                         <Route exact path="/account" component={() => <Account />}/>
                         <Route exact path="/cards" component={() => <Cards />}/>
                         <Route exact path="/settings" component={() => <Settings />}/>
+                        <Route exact path="/users" component={() => <Users />}/>
+                        <Route exact path="/create_admin" component={() => <NewAdmin />}/>
                         <Route path = "*" component={() => "404 NOT FOUND"}/>
                     </Switch>
                 </UserContext.Provider>
