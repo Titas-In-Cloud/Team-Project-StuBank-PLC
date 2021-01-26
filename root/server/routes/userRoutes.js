@@ -248,7 +248,8 @@ router.post("/newVirtualCard", async (req, res) =>{
     }
 })
 
-router.get("/", auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
+    const personalID = req.body;
     const user = await User.findById(req.user);
     res.json({
         personalID: user.personalID,
