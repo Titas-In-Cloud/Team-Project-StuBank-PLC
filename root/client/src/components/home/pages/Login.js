@@ -23,13 +23,31 @@ export default function Login () {
                 "http://localhost:5000/users/login",
                 loginUser
             );
-            setUserData({
-                token: loginRes.data.token,
-                user: loginRes.data.user,
-            });
-            localStorage.setItem("auth-token", loginRes.data.token);
-            sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/overview");
+
+            let totpToken = prompt("Please enter the google authenticator code: ");
+            //Get the totpSecret from the server-side
+            let totpSecret = loginRes.data.user.totpSecret.base32;
+            const totpData = {
+                "secret": totpSecret,
+                "token": totpToken
+            }
+
+            //Validate the google authenticator token
+            await Axios.post('http://localhost:5000/users/totp-validate', totpData)
+                .then(res => {
+                    // Set the user data to local and session storage if the token is valid
+                    if (res.data.valid) {
+
+                        setUserData({
+                            token: loginRes.data.token,
+                            user: loginRes.data.user,
+                        });
+                        localStorage.setItem("auth-token", loginRes.data.token);
+                        sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
+                        history.push("/overview");
+                    }
+                }
+                )
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }

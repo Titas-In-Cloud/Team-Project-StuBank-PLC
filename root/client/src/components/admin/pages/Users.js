@@ -8,7 +8,7 @@ import ErrorNotice from "../../misc/ErrorNotice";
 export default function Users () {
     const {userData, setUserData} = useContext(UserContext);
     let userDataToAmend = "";
-    //Sets user data to the logged in admin user if it is null to null pointer errors
+    //Sets user data to the logged in admin user if it is null to prevent null pointer errors
     if (!userDataToAmend) {
         userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
     }
