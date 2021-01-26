@@ -38,7 +38,7 @@ export default function Register () {
             });
             localStorage.setItem("auth-token", loginRes.data.token);
             sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/");
+            history.push("/overview");
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
