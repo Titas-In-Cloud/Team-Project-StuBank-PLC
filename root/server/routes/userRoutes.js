@@ -52,7 +52,10 @@ async function getUserData(PID){
             accountBalance: {data: aesDecrypt(userData.accountBalance)},
             recipients: userData.recipients,
             transactions: userData.transactions,
-            totpSecret: JSON.parse(aesDecrypt(userData.totpSecret))
+            totpSecret: JSON.parse(aesDecrypt(userData.totpSecret)),
+            cardNumber: {data: aesDecrypt(userData.cardNumber)},
+            CVV: {data: aesDecrypt(userData.CVV)},
+            frozenCard: userData.frozenCard
         }
     }
 }
@@ -105,7 +108,6 @@ router.post("/register", async(req, res) => {
         let totpSecret = speakeasy.generateSecret({
             name: "StuBank Plc"
         });
-
         const newUser = new User({
             email: aesEncrypt(email),
             password: passwordHash,
@@ -114,7 +116,10 @@ router.post("/register", async(req, res) => {
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
             accountBalance: aesEncrypt('50'),
-            totpSecret: aesEncrypt(JSON.stringify(totpSecret))
+            totpSecret: aesEncrypt(JSON.stringify(totpSecret)),
+            cardNumber: aesEncrypt(''),
+            CVV: aesEncrypt(''),
+            frozenCard: false
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
@@ -224,6 +229,25 @@ router.post("/updateData", async (req, res) =>{
         res.status(500).json({ error: err.message });
     }
 })
+
+router.post("/newVirtualCard", async (req, res) =>{
+    try{
+        const {cardNumber, CVV, frozen, PID} = req.body
+        if ((!cardNumber || !CVV))
+            return res.status(400).json({msg: "One or more required fields are blank"})
+        let userData
+        userData = await User.findOne({personalID: PID})
+        userData.cardNumber = aesEncrypt(cardNumber)
+        userData.CVV = aesEncrypt(CVV)
+        userData.frozenCard = frozen
+        userData.save()
+        res.json()
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
+
 router.get("/", auth, async (req, res) => {
     const user = await User.findById(req.user);
     res.json({
@@ -249,5 +273,56 @@ router.post("/totp-validate", (request, response, next) => {
     }
 });
 
+router.post("/amendDetails", async (req, res) =>{
+    try{
+        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID} = req.body;
+        let oldUser
+        oldUser = await User.findOne({personalID})
+        // validate
+        if(!email || !phoneNum || !firstName || !lastName)
+            return res.status(400).json({msg: "One or more required fields are blank"});
+        if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
+            return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
+        if (!(email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)))
+            return res.status(400).json({msg: "Email address is not valid, please enter a valid email, e.g. example@email.com"});
+
+        const emails = await User.find({},{email: 1});
+        for(let item of emails){
+            if (aesDecrypt(item.email) === email && email !== aesDecrypt(oldUser.email)){
+                return res.status(400).json({msg: "An account with this email already exists."});
+            }
+        }
+
+        const phonenums = await User.find({},{phoneNum: 1});
+        for(let item of phonenums) {
+            if (aesDecrypt(item.phoneNum) === phoneNum && phoneNum !== aesDecrypt(oldUser.phoneNum)) {
+                return res.status(400).json({msg: "An account with this phone number already exists."});
+            }
+        }
+
+        if (passwordOld || passwordNew || passwordCheck) {
+            const matchTrue = await bcrypt.compare(passwordOld, oldUser.password);
+            if(!matchTrue)
+                return res.status(400).json({msg: "Incorrect current password"})
+            if (passwordNew !== passwordCheck)
+                return res.status(400).json({msg: "Enter new password twice to ensure new password has been entered correctly"});
+            if (!(passwordNew.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
+                return res.status(400).json({msg: "New password is not valid"});
+
+            const salt = await bcrypt.genSalt();
+            oldUser.password = await bcrypt.hash(passwordNew, salt);
+        }
+
+        oldUser.email = aesEncrypt(email)
+        oldUser.firstName = aesEncrypt(firstName)
+        oldUser.lastName = aesEncrypt(lastName)
+        oldUser.phoneNum = aesEncrypt(phoneNum)
+        await oldUser.save()
+        res.json()
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
 
 module.exports = router;
