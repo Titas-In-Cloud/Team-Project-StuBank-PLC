@@ -36,14 +36,19 @@ export default function Login () {
                 .then(res => {
                     // Set the user data to local and session storage if the token is valid
                     if (res.data.valid) {
-
                         setUserData({
                             token: loginRes.data.token,
                             user: loginRes.data.user,
                         });
                         localStorage.setItem("auth-token", loginRes.data.token);
-                        sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-                        history.push("/overview");
+                        sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
+                        console.log("ZZ" + loginRes.data.user.role)
+                    if (loginRes.data.user.role === "admin"){
+                            history.push("/users")
+                        }
+                    else{
+                        history.push("/overview")
+                        }
                     }
                 }
                 )

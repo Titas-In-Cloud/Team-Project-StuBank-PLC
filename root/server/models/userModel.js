@@ -15,7 +15,8 @@ const userSchema = new mongoose.Schema({
     totpSecret: {type: Map, of: String, required: true},
     cardNumber: {type: Map, of: String, required: true},
     CVV: {type: Map, of: String, required: true},
-    frozenCard: {type: Boolean, required: true}
+    frozenCard: {type: Boolean, required: true},
+    role: {type: String, required:true}
 });
 
 module.exports = User = mongoose.model("user", userSchema);
