@@ -2,16 +2,20 @@ import React, {useState} from "react";
 import { MainNavigationBar } from "../../";
 import qrcode from "qrcode";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import Axios from "axios";
 
-export default function Overview () {
+export default function Overview() {
     let user = JSON.parse(sessionStorage.getItem("userData"));
-    const [balanceGBP] = useState(user.accountBalanceGBP.data);
-    const [balanceUSD] = useState(user.accountBalanceUSD.data);
-    const [balanceEUR] = useState(user.accountBalanceEUR.data);
-    const [qrCodeImg, setQrCodeImg] = useState();
+        const [balanceGBP] = useState(user.accountBalanceGBP.data);
+        const [balanceUSD] = useState(user.accountBalanceUSD.data);
+        const [balanceEUR] = useState(user.accountBalanceEUR.data);
+        const [qrCodeImg, setQrCodeImg] = useState();
 
-    //Converts totpSecret into a string to display the qr code so it can be scanned with google auth (if user logged in)
-    if (!qrCodeImg && user) {
+        //Converts totpSecret into a string to display the qr code so it can be scanned with google auth (if user logged in)
+        if(
+    !qrCodeImg && user
+)
+    {
         let totpSecret = user.totpSecret;
         qrcode.toDataURL(totpSecret.otpauth_url, function (err, data) {
             setQrCodeImg(data);
@@ -20,7 +24,7 @@ export default function Overview () {
 
     return (
         <div className="top-bar">
-            <MainNavigationBar />
+            <MainNavigationBar/>
             <div className="main-background">
                 <div className="small-bank-box-left">
                     <h1>Information</h1>
@@ -33,7 +37,7 @@ export default function Overview () {
                         You will not be able to login without it!
                     </p>
                     <div style={{paddingLeft: 120}}>
-                        <img style={{height: 300}} src = {qrCodeImg} alt=""/>
+                        <img style={{height: 300}} src={qrCodeImg} alt=""/>
                     </div>
                 </div>
                 <div className="small-bank-box-right">
@@ -44,7 +48,7 @@ export default function Overview () {
                         Your total USD balance: ${Number(balanceUSD).toFixed(2)}</p>
                     <p style={{color: "black", fontSize: 18, paddingLeft: 30, paddingTop: 5, paddingBottom: 10}}>
                         Your total EUR balance: €{Number(balanceEUR).toFixed(2)}</p>
-                    <h1 style={{paddingTop: 25}} >Your Most Recent Transactions</h1>
+                    <h1 style={{paddingTop: 25}}>Your Most Recent Transactions</h1>
                     <div className="table">
                         <TableContainer component={Paper}>
                             <Table>
@@ -58,7 +62,7 @@ export default function Overview () {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {user.transactions.reverse().slice(0,6).map((transaction) => (
+                                    {user.transactions.reverse().slice(0, 6).map((transaction) => (
                                         <TableRow key={transaction.date}>
                                             <TableCell component="th" scope="row" className="font-information">
                                                 {transaction.date}
