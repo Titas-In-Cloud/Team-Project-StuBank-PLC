@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import { MainNavigationBar } from "../../";
-import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Axios from "axios";
 
 export default function Transactions () {
-    const [showStatement, setShowStatement] = useState(false)
+    const [setShowStatement] = useState(false)
     let user = JSON.parse(sessionStorage.getItem("userData"))
 
     async function updateData() {
@@ -22,45 +22,41 @@ export default function Transactions () {
     }, []);
 
     return (
-        <div className="main-background">
+        <div className="top-bar">
             <MainNavigationBar />
-            <section className="main-background">
-                <div className="centered-text-default">
-                    <h1>Transactions</h1>
-                    <div>
-                    <Button variant={"contained"} disableElevation={true} onClick={() => {
-                        setShowStatement(!showStatement)
-                    }}>Show Statement</Button>
-                </div>
-                    {showStatement &&
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Date</TableCell>
-                                    <TableCell>Amount In</TableCell>
-                                    <TableCell>Amount Out</TableCell>
-                                    <TableCell>Account</TableCell>
-                                    <TableCell>Balance</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {user.transactions.map((transaction) => (
-                                    <TableRow key={transaction.date}>
-                                        <TableCell component="th" scope="row">
-                                            {transaction.date}
-                                        </TableCell>
-                                        <TableCell>{transaction.amountIn}</TableCell>
-                                        <TableCell>{transaction.amountOut}</TableCell>
-                                        <TableCell>{transaction.account}</TableCell>
-                                        <TableCell>{transaction.balance}</TableCell>
+            <div className="main-background">
+                <div className="big-bank-box">
+                    <h1>Transaction History</h1>
+                    <div className="table" style={{paddingBottom: 30}}>
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell className="font-headings">Date</TableCell>
+                                        <TableCell className="font-headings">Amount In</TableCell>
+                                        <TableCell className="font-headings">Amount Out</TableCell>
+                                        <TableCell className="font-headings">Account</TableCell>
+                                        <TableCell className="font-headings">Balance</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>}
+                                </TableHead>
+                                <TableBody>
+                                    {user.transactions.reverse().map((transaction) => (
+                                        <TableRow key={transaction.date}>
+                                            <TableCell component="th" scope="row" className="font-information">
+                                                {transaction.date}
+                                            </TableCell>
+                                            <TableCell className="font-information">{transaction.amountIn}</TableCell>
+                                            <TableCell className="font-information">{transaction.amountOut}</TableCell>
+                                            <TableCell className="font-information">{transaction.account}</TableCell>
+                                            <TableCell className="font-information">{transaction.balance}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </div>
                 </div>
-            </section>
+            </div>
         </div>
     )
 }
