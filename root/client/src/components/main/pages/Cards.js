@@ -51,10 +51,10 @@ export default function Cards () {
     }
 
     return (
-        <div className="main-background">
+        <div className="top-bar">
             <MainNavigationBar />
-            <section className="main-background">
-                <div className="centered-text-default">
+            <div className="main-background">
+                <div className="small-bank-box-left">
                     <h1>Cards</h1>
                     <div>
                         <Button variant={"contained"} disableElevation={true} onClick={() => {
@@ -87,7 +87,10 @@ export default function Cards () {
                         <input type="submit" value="Submit"/>
                     </form>
                 </div>
-            </section>
+                <div className="small-bank-box-right">
+                    <h1>Your Cards</h1>
+                </div>
+            </div>
         </div>
     )
 }
