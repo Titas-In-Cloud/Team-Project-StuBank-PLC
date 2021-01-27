@@ -69,7 +69,7 @@ router.post("/register", async(req, res) => {
         if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
             return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
         if(password !== passwordCheck)
-            return res.status(400).json({msg: "Enter password twice to ensure password has been entered correctly"});
+            return res.status(400).json({msg: "Passwords do not match"});
 
         const emails = await User.find({},{email: 1});
         for(let item of emails){
@@ -83,18 +83,12 @@ router.post("/register", async(req, res) => {
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
         }
-        /*const existingEmail = await User.findOne({email: email});
-        if(existingEmail)
-            return res.status(400).json({msg: "An account with this email already exists."});*/
         const existingPID = await User.findOne({personalID: personalID});
         if(existingPID)
             return res.status(400).json({msg: "An account with this personal ID already exists."});
-        /*const existingPhoneNum = await User.findOne({phoneNum: phoneNum});
-        if(existingPhoneNum)
-            return res.status(400).json({msg: "An account with this phone number already exists."});*/
-        // if (!(phone.match(/\d{2}-\d{4}-\d{7}$/))) {
-        //     res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number of the form XX--XXXX-XXXXXXX"});
-        // }
+        if (!(phoneNum.match(/^(07\d{8,12}|447\d{7,11})$/))) {
+            return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number (e.g 07123123123 or 447123123123)"});
+        }
         if (!(email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)))
             return res.status(400).json({msg: "Email address is not valid, please enter a valid email, e.g. example@email.com"});
         if (!(password.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
