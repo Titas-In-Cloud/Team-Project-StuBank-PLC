@@ -57,11 +57,13 @@ export default function Login () {
             <HomeNavigationBar/>
             <div className="login-registration">
                 <div className="box" >
-                    {error && (
-                        <ErrorNotice message={error} clearError={() => setError(undefined)} />
-                    )}
                     <div className="form" onSubmit={submit}>
                         <h2>Login</h2>
+                        <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 10}}>
+                            {error && (
+                                <ErrorNotice message={error} clearError={() => setError(undefined)} />
+                            )}
+                        </div>
                         <form>
                             <label htmlFor="login-personal-ID"/>
                             <div className="inputBox">
