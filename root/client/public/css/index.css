@@ -261,7 +261,6 @@ nav.home-nav{
     color: #b5b4b4;
     font-size: 1.8rem;
 }
-
 .sidebar .text h2.admin{
     position: absolute;
     padding-left: 20px;
@@ -326,6 +325,7 @@ nav.home-nav{
 }
 .main-background .big-bank-box{
     position: relative;
+    overflow: auto;
     left: 27rem;
     top: 12rem;
     width: 172vh;
@@ -345,6 +345,39 @@ nav.home-nav{
     border: 2px solid #ffffff;
     border-radius: 1.2rem;
     box-shadow: 0 5px 35px rgba(102, 102, 102, 0.2);
+}
+.main-background .small-bank-box-left{
+    position: absolute;
+    left: 30rem;
+    top: 12rem;
+    width: 60vh;
+    height: 70vh;
+    background: rgba(253, 253, 253, 1);
+    border: 2px solid #ffffff;
+    border-radius: 1.2rem;
+    box-shadow: 0 5px 35px rgba(102, 102, 102, 0.2);
+}
+.main-background .small-bank-box-right{
+    position: absolute;
+    right: 5rem;
+    top: 12rem;
+    width: 100vh;
+    height: 70vh;
+    background: rgba(253, 253, 253, 1);
+    border: 2px solid #ffffff;
+    border-radius: 1.2rem;
+    box-shadow: 0 5px 35px rgba(102, 102, 102, 0.2);
+}
+.main-background .table{
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+.main-background .table .font-information{
+    font-size: 16px;
+}
+.main-background .table .font-headings{
+    font-size: 22px;
 }
 
 .main-background h1{
