@@ -11,13 +11,13 @@ import TelephoneLogo from "../../images/telephone-logo.png";
 import EmailLogo from "../../images/email-logo.png";
 
 export default function Register () {
-    const [email, setEmail] = useState();
-    const [firstName, setFirstName] = useState();
-    const [lastName, setLastName] = useState();
-    const [password, setPassword] = useState();
-    const [passwordCheck, setPasswordCheck] = useState();
-    const [personalID, setPersonalID] = useState();
-    const [phoneNum, setPhoneNum] = useState();
+    const [email, setEmail] = useState(undefined);
+    const [firstName, setFirstName] = useState(undefined);
+    const [lastName, setLastName] = useState(undefined);
+    const [password, setPassword] = useState(undefined);
+    const [passwordCheck, setPasswordCheck] = useState(undefined);
+    const [personalID, setPersonalID] = useState(undefined);
+    const [phoneNum, setPhoneNum] = useState(undefined);
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
     const history = useHistory();
@@ -38,7 +38,7 @@ export default function Register () {
             });
             localStorage.setItem("auth-token", loginRes.data.token);
             sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/");
+            history.push("/overview");
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
