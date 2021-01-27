@@ -84,7 +84,7 @@ export default function Cards () {
                             defaultChecked = {frozen}
                             onChange = {(e) => setFrozen(!frozen)}
                         />
-                        <input type="submit" value="Submit"/>
+                        <input type="submit" value="Save"/>
                     </form>
                 </div>
                 <div className="small-bank-box-right">
