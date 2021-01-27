@@ -27,8 +27,8 @@ export default function Overview () {
                     <p style={{color: "black", fontSize: 18, paddingLeft: 20, paddingTop: 10, paddingBottom: 15}}>
                         Welcome, {user.firstName.data} {user.lastName.data}!</p>
                     <p style={{color: "black", fontSize: 16, paddingLeft: 25, paddingRight: 25, paddingBottom: 5}}>
-                        Please, scan this QR code with Google Authenticator app to protect your account with
-                        2 Factor Authentication.</p>
+                        Please, scan this QR code with Google Authenticator app on your smartphone to protect
+                        your account with 2 Factor Authentication.</p>
                     <p style={{color: "#FF5454", fontSize: 14, paddingLeft: 30, paddingRight: 25}}>
                         You will not be able to login without it!
                     </p>
