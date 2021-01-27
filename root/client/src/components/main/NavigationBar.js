@@ -25,6 +25,7 @@ function NavigationBar(){
         localStorage.clear()
     }
 
+
     return (
         <div className="top-bar">
             <div className="sidebar">
@@ -65,7 +66,7 @@ function NavigationBar(){
                 </div>
             </div>
             <div className="button">
-                <Link to="/login" onClick={logout}>
+                <Link to="/login" onClick={() => logout()}>
                     <img className="image-logout" src={LogoutLogo} alt="Logout"/>
                     <p style={{color: "#ff1b1b" }}>Logout</p>
                 </Link>
