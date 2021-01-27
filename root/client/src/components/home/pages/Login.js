@@ -4,13 +4,12 @@ import {Link, useHistory} from "react-router-dom";
 import UserContext from "../../../context/UserContext";
 import ErrorNotice from "../../misc/ErrorNotice";
 import Axios from "axios";
-
 import UserLogo from "../../images/user-logo.png";
 import LockLogo from "../../images/lock-logo.png";
 
 export default function Login () {
-    const [personalID, setPersonalID] = useState();
-    const [password, setPassword] = useState();
+    const [personalID, setPersonalID] = useState(undefined);
+    const [password, setPassword] = useState(undefined);
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
     const history = useHistory();
