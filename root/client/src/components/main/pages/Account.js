@@ -29,6 +29,9 @@ export default function Account () {
             setBalanceUSD(user.accountBalanceUSD.data)
             setBalanceEUR(user.accountBalanceEUR.data)
             setShowTransfer(false)
+            setShowConvert(false)
+            setErrorTransfer(undefined)
+            setErrorConvert(undefined)
             setRecipient({label: '', value: ''})
             setAmountTransfer('')
             setAmountConvert('')
@@ -74,7 +77,6 @@ export default function Account () {
         e.preventDefault();
         try {
             const data = {personalID: user.personalID, amount: amountConvert, to: currencyTo, from: currencyFrom}
-            console.log(data)
             await Axios.post("http://localhost:5000/users/convert", data)
             await updateData()
         } catch (err) {
@@ -82,6 +84,7 @@ export default function Account () {
             err.response.data.msg && setErrorConvert(err.response.data.msg)
         }
     }
+
     return (
         <div className="top-bar">
             <MainNavigationBar/>

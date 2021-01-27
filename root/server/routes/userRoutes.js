@@ -188,6 +188,26 @@ router.post("/tokenIsValid", async (req, res) =>{
     }
 })
 
+function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, currency){
+    let date = new Date()
+    date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
+    console.log('1')
+    payerBalance = parseFloat(Number(aesDecrypt(payerBalance)) - Number(amount)).toFixed(2)
+    console.log('1.5')
+    if (Number(payerBalance) < 0) {return false}
+    else {payerBalance = aesEncrypt(payerBalance)}
+    console.log('2')
+    payeeBalance = aesEncrypt((parseFloat(aesDecrypt(payeeBalance)) + parseFloat(amount)).toFixed(2))
+    console.log('3')
+    const transactionIn = {date, amountIn: aesEncrypt(amount), amountOut: aesEncrypt(''), account: payerID,
+        balance: payeeBalance, currency}
+    console.log('4')
+    const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(amount), account: payeeID.value,
+        balance: payerBalance, currency}
+    console.log('5')
+    return {payeeBalance, payerBalance, transactionIn, transactionOut}
+}
+
 router.post("/transfer", async (req, res) =>{
     try{
         const {payerID, payeeID, amount, currency} = req.body
@@ -199,63 +219,46 @@ router.post("/transfer", async (req, res) =>{
             return res.status(400).json({msg: "Please enter a monetary value"});
         let payee
         payee = await User.findOne({personalID: payeeID.value});
-        let payer
-        payer = await User.findOne({personalID: payerID});
-        const date = new Date()
-        if (payee)
+        if (payee) {
+            let payer
+            payer = await User.findOne({personalID: payerID});
+            let data
             switch (currency) {
                 case '£':
-                    {payee.accountBalanceGBP = aesEncrypt((parseFloat(aesDecrypt(payee.accountBalanceGBP)) +
-                    parseFloat(amount)).toFixed(2))}
-                    payee.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
-                        amountOut: aesEncrypt(''), account: payerID, balance: payee.accountBalanceGBP, currency})
-                    payer.accountBalanceGBP = aesEncrypt((parseFloat(aesDecrypt(payer.accountBalanceGBP)) -
-                        parseFloat(amount)).toFixed(2))
-                    if (payer.accountBalanceGBP < 0)
-                        return res.status(400).json({msg: "Insufficient funds"});
-                    payer.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                        amountOut: aesEncrypt(amount), account: payeeID.value, balance: payer.accountBalanceGBP, currency})
-                    if (payeeID.__isNew__ !== undefined)
+                    data = transferMoney(payee.accountBalanceGBP, payer.accountBalanceGBP, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceGBP = data.payeeBalance
+                        payer.accountBalanceGBP = data.payerBalance
+                    }
                     break
                 case '$':
-                    {payee.accountBalanceUSD = aesEncrypt((parseFloat(aesDecrypt(payee.accountBalanceUSD)) +
-                    parseFloat(amount)).toFixed(2))}
-                    payee.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
-                        amountOut: aesEncrypt(''), account: payerID, balance: payee.accountBalanceUSD, currency})
-                    payer.accountBalanceUSD = aesEncrypt((parseFloat(aesDecrypt(payer.accountBalanceUSD)) -
-                        parseFloat(amount)).toFixed(2))
-                    if (payer.accountBalanceUSD < 0)
-                        return res.status(400).json({msg: "Insufficient funds"});
-                    payer.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                        amountOut: aesEncrypt(amount), account: payeeID.value, balance: payer.accountBalanceUSD, currency})
-                    if (payeeID.__isNew__ !== undefined)
+                    data = transferMoney(payee.accountBalanceUSD, payer.accountBalanceUSD, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceUSD = data.payeeBalance
+                        payer.accountBalanceUSD = data.payerBalance
+                    }
                     break
                 case '€':
-                    {payee.accountBalanceEUR = aesEncrypt((parseFloat(aesDecrypt(payee.accountBalanceEUR)) +
-                    parseFloat(amount)).toFixed(2))}
-                    payee.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
-                        amountOut: aesEncrypt(''), account: payerID, balance: payee.accountBalanceEUR, currency})
-                    payer.accountBalanceEUR = aesEncrypt((parseFloat(aesDecrypt(payer.accountBalanceEUR)) -
-                        parseFloat(amount)).toFixed(2))
-                    if (payer.accountBalanceEUR < 0)
-                        return res.status(400).json({msg: "Insufficient funds"});
-                    payer.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                        amountOut: aesEncrypt(amount), account: payeeID.value, balance: payer.accountBalanceEUR, currency})
+                    data = transferMoney(payee.accountBalanceEUR, payer.accountBalanceEUR, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceEUR = data.payeeBalance
+                        payer.accountBalanceEUR = data.payerBalance
+                    }
                     break
             }
+            payer.transactions.push(data.transactionOut)
+            payee.transactions.push(data.transactionIn)
+            if (payeeID.__isNew__ !== undefined)
+                payer.recipients.push({label: payeeID.label, value: payeeID.value})
+            payee.save()
+            payer.save()
+            res.json()
+        }
         else
             {return res.status(400).json({msg: "The payee doesn't exist"})}
-        if (payeeID.__isNew__ !== undefined)
-            payer.recipients.push({label: payeeID.label, value: payeeID.value})
-        payee.save()
-        payer.save()
-        res.json()
     }
     catch(err) {
         res.status(500).json({ error: err.message });
@@ -369,21 +372,19 @@ router.post("/amendDetails", async (req, res) =>{
     }
 })
 
-/*function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, amount, personalID){
-    const date = new Date()
+function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbolTo, symbolFrom, amount, personalID){
+    let date = new Date()
+    date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
     balanceTo = aesEncrypt(parseFloat(Number(aesDecrypt(balanceTo))
-        + Number(money.convert(Number(amount), {from: currencyFrom, to: currencyTo}))).toFixed(2))
+        + Number(money.convert(Number(amount), {from: String(currencyFrom), to: (currencyTo)}))).toFixed(2))
     balanceFrom = aesEncrypt(parseFloat(Number(aesDecrypt(balanceFrom))
         - Number(amount)).toFixed(2))
-    const transactionOut = {date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-        amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceGBP, currency: from}
-    const transactionIn = {date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-            ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-        amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "GBP", to: "USD"})).toFixed(2))),
-        amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceUSD, currency: to}
-    return{balanceTo, balanceFrom}
-}*/
+    const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(String(amount)), account: personalID,
+        balance: balanceFrom, currency: symbolFrom}
+    const transactionIn = {date, amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "GBP", to: "USD"})).toFixed(2))),
+        amountOut: aesEncrypt(''), account: personalID, balance: balanceTo, currency: symbolTo}
+    return{balanceTo, balanceFrom, transactionOut, transactionIn}
+}
 
 router.post("/convert", async (req, res) =>{
     try{
@@ -394,99 +395,59 @@ router.post("/convert", async (req, res) =>{
             return res.status(400).json({msg: "Please choose two different currencies"});
         let user
         user = await User.findOne({personalID: personalID});
-        const date = new Date()
+        let data
         switch (from){
             case '£':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceGBP)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
                 switch (to) {
                     case '$':
-                        user.accountBalanceUSD = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceUSD))
-                            + Number(money.convert(Number(amount), {from: "GBP", to: "USD"}))).toFixed(2))
-                        user.accountBalanceGBP = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceGBP))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceGBP, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "GBP", to: "USD"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceUSD, currency: to})
+                        data = convertCurrency(user.accountBalanceUSD, user.accountBalanceGBP, "USD", "GBP", to, from, amount, personalID)
+                        user.accountBalanceUSD = data.balanceTo
+                        user.accountBalanceGBP = data.balanceFrom
                         break
                     case '€':
-                        user.accountBalanceEUR = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceEUR))
-                            + Number(money.convert(Number(amount), {from: "GBP", to: "EUR"}))).toFixed(2))
-                        user.accountBalanceGBP = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceGBP))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceGBP, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "GBP", to: "EUR"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceEUR, currency: to})
+                        data = convertCurrency(user.accountBalanceEUR, user.accountBalanceGBP, "EUR", "GBP", to, from, amount, personalID)
+                        user.accountBalanceEUR = data.balanceTo
+                        user.accountBalanceGBP = data.balanceFrom
                         break
                 }
                 break
             case '$':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceUSD)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
                 switch (to) {
                     case '£':
-                        user.accountBalanceGBP = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceGBP))
-                            + Number(money.convert(Number(amount), {from: "USD", to: "GBP"}))).toFixed(2))
-                        user.accountBalanceUSD = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceUSD))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceUSD, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "USD", to: "GBP"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceGBP, currency: to})
+                        data = convertCurrency(user.accountBalanceGBP, user.accountBalanceUSD, "GBP", "USD", to, from, amount, personalID)
+                        user.accountBalanceGBP = data.balanceTo
+                        user.accountBalanceUSD = data.balanceFrom
                         break
                     case '€':
-                        user.accountBalanceEUR = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceEUR))
-                            + Number(money.convert(Number(amount), {from: "USD", to: "EUR"}))).toFixed(2))
-                        user.accountBalanceUSD = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceUSD))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceEUR, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "USD", to: "EUR"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceEUR, currency: to})
+                        data = convertCurrency(user.accountBalanceEUR, user.accountBalanceUSD, "EUR", "USD", to, from, amount, personalID)
+                        user.accountBalanceEUR = data.balanceTo
+                        user.accountBalanceUSD = data.balanceFrom
                         break
                 }
                 break
             case '€':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceEUR)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
                 switch (to) {
                     case '£':
-                        user.accountBalanceGBP = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceGBP))
-                            + Number(money.convert(Number(amount), {from: "EUR", to: "GBP"}))).toFixed(2))
-                        user.accountBalanceEUR = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceEUR))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceEUR, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "EUR", to: "GBP"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceGBP, currency: to})
+                        data = convertCurrency(user.accountBalanceGBP, user.accountBalanceEUR, "GBP", "EUR", to, from, amount, personalID,)
+                        user.accountBalanceGBP = data.balanceTo
+                        user.accountBalanceEUR = data.balanceFrom
                         break
                     case '$':
-                        user.accountBalanceUSD = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceUSD))
-                            + Number(money.convert(Number(amount), {from: "EUR", to: "USD"}))).toFixed(2))
-                        user.accountBalanceEUR = aesEncrypt(parseFloat(Number(aesDecrypt(user.accountBalanceEUR))
-                            - Number(amount)).toFixed(2))
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-                            amountOut: aesEncrypt(String(amount)), account: personalID, balance: user.accountBalanceEUR, currency: from})
-                        user.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())),
-                            amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "EUR", to: "USD"})).toFixed(2))),
-                            amountOut: aesEncrypt(''), account: personalID, balance: user.accountBalanceUSD, currency: to})
+                        data = convertCurrency(user.accountBalanceUSD, user.accountBalanceEUR, "USD", "EUR", to, from, amount, personalID)
+                        user.accountBalanceUSD = data.balanceTo
+                        user.accountBalanceEUR = data.balanceFrom
                         break
                 }
                 break
         }
+        user.transactions.push(data.transactionOut)
+        user.transactions.push(data.transactionIn)
         user.save()
         res.json()
     }
