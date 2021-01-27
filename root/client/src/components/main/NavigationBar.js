@@ -11,10 +11,10 @@ import CardLogo from "../images/card-logo.png";
 import UserContext from "../../context/UserContext";
 
 function NavigationBar(){
-    // let user = JSON.parse(sessionStorage.getItem("userData"))
-    // const balance = user.accountBalance;
+    let user = JSON.parse(sessionStorage.getItem("userData"));
 
-    const {userData, setUserData} = useContext(UserContext);
+    const {setUserData} = useContext(UserContext);
+
     // This removes the authentication token from the user data and also the local storage when the user logs out
     const logout = () => {
         setUserData({
@@ -27,8 +27,6 @@ function NavigationBar(){
 
     return (
         <div className="top-bar">
-            <h5>Balance</h5>
-            {/*<h4>£{balance}</h4>*/}
             <div className="sidebar">
                 <div className="nav-brand">
                     <Link to="/overview">
@@ -62,8 +60,8 @@ function NavigationBar(){
                     </li>
                 </ul>
                 <div className="text">
-                    {/*<h1>{user.firstName.data} {user.lastName.data}</h1>*/}
-                    {/*<h2>ID: {user.personalID}</h2>*/}
+                    <h1>{user.firstName.data} {user.lastName.data}</h1>
+                    <h2>ID: {user.personalID}</h2>
                 </div>
             </div>
             <div className="button">
