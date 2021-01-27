@@ -61,7 +61,7 @@ export default function Account () {
     async function submitTransfer(e) {
         e.preventDefault();
         try {
-            const data = {payerID: user.personalID, payeeID: recipient, amountTransfer, currency}
+            const data = {payerID: user.personalID, payeeID: recipient, amount: amountTransfer, currency}
             await Axios.post("http://localhost:5000/users/transfer", data)
             await updateData()
         } catch (err) {
