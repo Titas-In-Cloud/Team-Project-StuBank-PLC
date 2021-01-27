@@ -64,7 +64,8 @@ async function getUserData(PID){
             totpSecret: JSON.parse(aesDecrypt(userData.totpSecret)),
             cardNumber: {data: aesDecrypt(userData.cardNumber)},
             CVV: {data: aesDecrypt(userData.CVV)},
-            frozenCard: userData.frozenCard
+            frozenCard: userData.frozenCard,
+            role: userData.role
         }
     }
 }
@@ -124,7 +125,8 @@ router.post("/register", async(req, res) => {
             totpSecret: aesEncrypt(JSON.stringify(totpSecret)),
             cardNumber: aesEncrypt(''),
             CVV: aesEncrypt(''),
-            frozenCard: false
+            frozenCard: false,
+            role: "user"
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
