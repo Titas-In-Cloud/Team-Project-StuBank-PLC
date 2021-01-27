@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, MenuItem, Select} from "@material-ui/core";
+import {MenuItem, Select} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice"
 import Axios from "axios";
 import CreatableSelect from 'react-select/creatable';
@@ -83,82 +83,114 @@ export default function Account () {
         }
     }
     return (
-        <div className="main-background">
+        <div className="top-bar">
             <MainNavigationBar/>
-            <section className="main-background">
-                <div className="centered-text-default">
-                    <h1>Account</h1>
-                    <h3>Welcome, {user.firstName.data} {user.lastName.data}</h3>
-                    <div>Your GBP balance is £{Number(balanceGBP).toFixed(2)}</div>
-                    <div>Your USD balance is ${Number(balanceUSD).toFixed(2)}</div>
-                    <div>Your EUR balance is €{Number(balanceEUR).toFixed(2)}</div>
-                    <div>
-                        <Button variant={"contained"} disableElevation={true} onClick={() => {
+            <div className="main-background">
+                <div className="small-bank-box">
+                    <h1>Account Balance</h1>
+                    <p style={{color: "black", fontSize: 18, paddingLeft: 30, paddingTop: 15, paddingBottom: 10}}>
+                        Your total GBP balance: £{Number(balanceGBP).toFixed(2)}</p>
+                    <p style={{color: "black", fontSize: 18, paddingLeft: 30, paddingTop: 5, paddingBottom: 10}}>
+                        Your total USD balance: ${Number(balanceUSD).toFixed(2)}</p>
+                    <p style={{color: "black", fontSize: 18, paddingLeft: 30, paddingTop: 5, paddingBottom: 10}}>
+                        Your total EUR balance: €{Number(balanceEUR).toFixed(2)}</p>
+                    <div className="inputBox" style={{paddingLeft: 20, paddingTop: 40, paddingBottom: 20}}>
+                        <btn className="button-account" disableElevation={true} onClick={() => {
                             setShowTransfer(!showTransfer)
-                        }}>Transfer</Button>
+                        }}>New Transfer</btn>
                     </div>
                     {showTransfer && (
-                        <form className="Form1" onSubmit={submitTransfer}>
-                            {errorTransfer && (<ErrorNotice message={errorTransfer} clearError={() => setErrorTransfer(undefined)}/>)}
+                        <form className="form-account" onSubmit={submitTransfer}>
+                            <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 5}}>
+                                {errorTransfer && (<ErrorNotice message={errorTransfer}
+                                                                clearError={() => setErrorTransfer(undefined)}/>)}
+                            </div>
                             <label>Payee Personal ID: </label>
-                            <CreatableSelect
-                                options={user.recipients}
-                                onChange={recipientChange}
-                            />
-                            <Select
-                                defaultValue={'£'}
-                                onChange={currencyChange}
-                            >
-                                <MenuItem value={'£'}>GBP</MenuItem>
-                                <MenuItem value={'$'}>USD</MenuItem>
-                                <MenuItem value={'€'}>EUR</MenuItem>
-                            </Select>
-                            <input
-                                type="text"
-                                name="Amount"
-                                onChange={(e) => setAmountTransfer(e.target.value)}
-                            />
-                            <input type="submit" value="Submit"/>
+                            <div style={{paddingTop: 10}}>
+                                <div style={{fontSize: 16, paddingBottom: 10}}>
+                                    <CreatableSelect
+                                        options={user.recipients}
+                                        onChange={recipientChange}
+                                    />
+                                </div>
+                                <label>Amount and Currency:</label>
+                                <div style={{paddingTop: 5}}>
+                                    <input
+                                        type="text"
+                                        name="Amount"
+                                        style={{width: 200, height: 25, fontSize: 16}}
+                                        onChange={(e) => setAmountTransfer(e.target.value)}
+                                    />
+                                    <Select
+                                        defaultValue={'£'}
+                                        onChange={currencyChange}
+                                        style={{fontSize: 14}}
+                                    >
+                                        <MenuItem style={{fontSize: 14}} value={'£'}>GBP</MenuItem>
+                                        <MenuItem style={{fontSize: 14}} value={'$'}>USD</MenuItem>
+                                        <MenuItem style={{fontSize: 14}} value={'€'}>EUR</MenuItem>
+                                    </Select>
+                                    <div style={{paddingTop: 10}}>
+                                        <input className="button-account" style={{width: 110, fontSize: 12}} type="submit" value="Submit"/>
+                                    </div>
+                                </div>
+                            </div>
+
                         </form>)}
-                    <div>
-                        <Button variant={"contained"} disableElevation={true} onClick={() => {
+                    <div className="inputBox" style={{paddingLeft: 20, paddingTop: 30, paddingBottom: 20}}>
+                        <btn className="button-account" disableElevation={true} onClick={() => {
                             setShowConvert(!showConvert)
-                        }}>Convert</Button>
+                        }}>Convert Currencies</btn>
                     </div>
                     {showConvert && (
-                        <form className="Form2" onSubmit={submitConvert}>
-                            {errorConvert && (<ErrorNotice message={errorConvert} clearError={() => setErrorConvert(undefined)}/>)}
-                            <label>Currency From: </label>
-                            <Select
-                                defaultValue={'£'}
-                                onChange={currencyFromChange}
-                            >
-                                <MenuItem value={'£'}>GBP</MenuItem>
-                                <MenuItem value={'$'}>USD</MenuItem>
-                                <MenuItem value={'€'}>EUR</MenuItem>
-                            </Select>
-                            <label>Currency To: </label>
-                            <Select
-                                defaultValue={'£'}
-                                onChange={currencyToChange}
-                            >
-                                <MenuItem value={'£'}>GBP</MenuItem>
-                                <MenuItem value={'$'}>USD</MenuItem>
-                                <MenuItem value={'€'}>EUR</MenuItem>
-                            </Select>
-                            <label>Amount: </label>
-                            <input
-                                type="text"
-                                name="Amount"
-                                onChange={(e) => setAmountConvert(e.target.value)}
-                            />
-                            <input type="submit" value="Submit"/>
+                        <form className="form-account" onSubmit={submitConvert}>
+                            <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 5}}>
+                                {errorConvert && (<ErrorNotice message={errorConvert}
+                                                               clearError={() => setErrorConvert(undefined)}/>)}
+                            </div>
+                            <div>
+                                <label>Currency From: </label>
+                                <Select
+                                    defaultValue={'£'}
+                                    onChange={currencyFromChange}
+                                    style={{fontSize: 14}}
+                                >
+                                    <MenuItem style={{fontSize: 14}} value={'£'}>GBP</MenuItem>
+                                    <MenuItem style={{fontSize: 14}} value={'$'}>USD</MenuItem>
+                                    <MenuItem style={{fontSize: 14}} value={'€'}>EUR</MenuItem>
+                                </Select>
+                            </div>
+                            <div style={{paddingTop: 10}}>
+                                <label>Currency To: </label>
+                                <Select
+                                    defaultValue={'£'}
+                                    onChange={currencyToChange}
+                                    style={{fontSize: 14}}
+                                >
+                                    <MenuItem style={{fontSize: 14}} value={'£'}>GBP</MenuItem>
+                                    <MenuItem style={{fontSize: 14}} value={'$'}>USD</MenuItem>
+                                    <MenuItem style={{fontSize: 14}} value={'€'}>EUR</MenuItem>
+                                </Select>
+                            </div>
+                            <div style={{paddingTop: 10}}>
+                                <label>Amount:  </label>
+                                <input
+                                    type="text"
+                                    name="Amount"
+                                    style={{width: 200, height: 25, fontSize: 16}}
+                                    onChange={(e) => setAmountConvert(e.target.value)}
+                                />
+                                <div style={{paddingTop: 10}}>
+                                    <input className="button-account" style={{width: 110, fontSize: 12}}
+                                           type="submit" value="Submit"/>
+                                </div>
+                            </div>
                         </form>
                     )
 
                     }
                 </div>
-            </section>
+            </div>
         </div>
     )
 }

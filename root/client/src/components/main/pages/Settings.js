@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import { MainNavigationBar } from "../../";
-import {Button} from "@material-ui/core";
 import Axios from "axios";
 import {useHistory} from "react-router-dom";
 import UserContext from "../../../context/UserContext";
@@ -8,7 +7,7 @@ import ErrorNotice from "../../misc/ErrorNotice";
 
 export default function Settings () {
     const history = useHistory();
-    const {userData, setUserData} = useContext(UserContext);
+    const {setUserData} = useContext(UserContext);
     let user = JSON.parse(sessionStorage.getItem("userData"))
     const [showAmend, setShowAmend] = useState(false)
     const [errorAmend, setErrorAmend] = useState();
@@ -82,70 +81,118 @@ export default function Settings () {
     }
 
     return (
-        <div className="main-background">
+        <div className="top-bar">
             <MainNavigationBar />
-            <section className="main-background">
-                <div className="centered-text-default">
+            <div className="main-background">
+                <div className="small-bank-box">
                     <h1>Settings</h1>
                     <div>
-                        <Button variant={"contained"} disableElevation={true} onClick={() => {
+                        <p style={{fontSize: 18, color: "black", paddingLeft: 20, paddingTop: 25, paddingBottom: 15}}>
+                            Your Account Details:</p>
+                        <div className="form-account" onSubmit={submitAmend}>
+                            <label>User ID: {user.personalID}</label>
+                        </div>
+                        <div className="form-account" onSubmit={submitAmend}>
+                            <label>First Name: {user.firstName.data}</label>
+                        </div>
+                        <div className="form-account" onSubmit={submitAmend}>
+                            <label>Last Name: {user.lastName.data}</label>
+                        </div>
+                        <div className="form-account" onSubmit={submitAmend}>
+                            <label>Telephone Number: {user.phoneNum.data}</label>
+                        </div>
+                        <div className="form-account" onSubmit={submitAmend}>
+                            <label>Email: {user.email.data}</label>
+                        </div>
+                    </div>
+                    <div className="inputBox" style={{paddingLeft: 20, paddingTop: 30, paddingBottom: 20}}>
+                        <btn className="button-account" disableElevation={true} onClick={() => {
                             setShowAmend(!showAmend)
-                        }}>Amend Details</Button>
+                        }}>Amend Details</btn>
                     </div>
                     {showAmend &&
-                    <form className="form" onSubmit={submitAmend}>
-                        {errorAmend && (<ErrorNotice message={errorAmend} clearError={() => setErrorAmend(undefined)}/>)}
-                        <label htmlFor="register-email">Email</label>
-                        <input
-                            id="register-email"
-                            type="email"
-                            defaultValue={user.email.data}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <label htmlFor="register-first-name">First name</label>
-                        <input
-                            id="register-first-name"
-                            type="text"
-                            defaultValue={user.firstName.data}
-                            onChange={(e) => setFirstName(e.target.value)}
-                        />
-                        <label htmlFor="register-last-name">Last name</label>
-                        <input
-                            id="register-last-name"
-                            type="text"
-                            defaultValue={user.lastName.data}
-                            onChange={(e) => setLastName(e.target.value)}
-                        />
-                        <label htmlFor="register-phone-num">Phone Num</label>
-                        <input
-                            id="register-phone-num"
-                            type="text"
-                            defaultValue={user.phoneNum.data}
-                            onChange={(e) => setPhoneNum(e.target.value)}
-                        />
-                        <label htmlFor="passwordOld">Current Password</label>
-                        <input
-                            id="passwordOld"
-                            type="password"
-                            onChange={(e) => setPasswordOld(e.target.value)}
-                        />
-                        <label htmlFor="passwordNew">New Password</label>
-                        <input
-                            id="passwordNew"
-                            type="password"
-                            onChange={(e) => setPasswordNew(e.target.value)}
-                        />
-                        <input
-                            type="password"
-                            placeholder="Verify password"
-                            onChange={(e) => setPasswordCheck(e.target.value)}
-                        />
-                        <input type="submit" value="Amend"/>
+                    <form className="form-account" onSubmit={submitAmend}>
+                        <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 5}}>
+                            {errorAmend && (<ErrorNotice message={errorAmend}
+                                                            clearError={() => setErrorAmend(undefined)}/>)}
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="register-first-name"
+                                type="text"
+                                placeholder="First Name"
+                                defaultValue={user.firstName.data}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="register-last-name"
+                                type="text"
+                                placeholder="Last Name"
+                                defaultValue={user.lastName.data}
+                                onChange={(e) => setLastName(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="register-phone-num"
+                                type="tel"
+                                placeholder="Telephone Number"
+                                defaultValue={user.phoneNum.data}
+                                onChange={(e) => setPhoneNum(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="register-email"
+                                type="email"
+                                placeholder="Email Address"
+                                defaultValue={user.email.data}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="passwordNew"
+                                type="password"
+                                placeholder="New Password"
+                                onChange={(e) => setPasswordNew(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                type="password"
+                                placeholder="Verify Your New Password"
+                                onChange={(e) => setPasswordCheck(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input
+                                className="input-settings"
+                                id="passwordOld"
+                                type="password"
+                                placeholder="Current Password"
+                                onChange={(e) => setPasswordOld(e.target.value)}
+                            />
+                        </div>
+                        <div style={{paddingTop: 10}}>
+                            <input className="button-account" style={{width: 110, fontSize: 12}}
+                                   type="submit" value="Amend"/>
+                        </div>
                     </form>}
-                    <Button variant={"contained"} disableElevation={true} onClick={handleDeleteAccount}>
-                        Click here to delete account</Button>
+                    <div className="inputBox" style={{paddingLeft: 20, paddingTop: 20, paddingBottom: 20}}>
+                        <btn className="button-account" disableElevation={true} onClick={handleDeleteAccount()}>
+                            Click here to delete account</btn>
+                    </div>
                 </div>
-            </section>
+            </div>
         </div>
     )
 }
