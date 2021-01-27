@@ -1,12 +1,35 @@
 import React, {useState, useEffect} from "react";
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom';
 import { Home, Features, AboutUs, FAQ, Login, Register } from "./components";
 import { Overview, Transactions, Account, Cards, Settings } from "./components";
 import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
 import Axios from "axios";
+import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRouteAdmin from "./ProtectedRouteAdmin";
 
 export default function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    console.log("auth status: " + isAuthenticated)
+
+        const checkAuth = async () => {
+            const token = localStorage.getItem('auth-token');
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            await request.post('http://localhost:5000/users/tokenIsValid')
+                .then( res => {
+                    console.log("response: " + res.data)
+                if (res.data) {
+                setIsAuthenticated(true);
+            }
+                else{
+                    setIsAuthenticated(false);
+            }
+        })
+        }
     const [userData, setUserData] = useState({
         token: undefined,
         user: undefined,
@@ -42,19 +65,19 @@ export default function App() {
                 <UserContext.Provider value={{userData, setUserData}}>
                     <Switch>
                         <Route exact path="/" component={() => <Home />}/>
-                        <Route exact path="/home" component={() => <Home />}/>
-                        <Route exact path="/features" component={() => <Features />}/>
-                        <Route exact path="/about_us" component={() => <AboutUs />}/>
-                        <Route exact path="/FAQ" component={() => <FAQ />}/>
-                        <Route exact path="/login" component={() => <Login />}/>
-                        <Route exact path="/register" component={() => <Register />}/>
-                        <Route exact path="/overview" component={() => <Overview />}/>
-                        <Route exact path="/transactions" component={() => <Transactions />}/>
-                        <Route exact path="/account" component={() => <Account />}/>
-                        <Route exact path="/cards" component={() => <Cards />}/>
-                        <Route exact path="/settings" component={() => <Settings />}/>
-                        <Route exact path="/users" component={() => <Users />}/>
-                        <Route exact path="/create_admin" component={() => <NewAdmin />}/>
+                        <Route exact path="/home" component={() => <Home />} onEnter={checkAuth()} auth={isAuthenticated} />
+                        <Route exact path="/features" component={() => <Features/>} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <Route exact path="/about_us" component={() => <AboutUs />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <Route exact path="/FAQ" component={() => <FAQ />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <Route exact path="/login" component={() => <Login />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <Route exact path="/register" component={() => <Register />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRoute path='/overview' component={() => <Overview />} onEnter={checkAuth()} auth={isAuthenticated} />
+                        <ProtectedRoute exact path="/transactions" component={() => <Transactions />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRoute exact path="/account" component={() => <Account />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRoute exact path="/cards" component={() => <Cards />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRoute exact path="/settings" component={() => <Settings />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRouteAdmin exact path="/users" component={() => <Users />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRouteAdmin exact path="/create_admin" component={() => <NewAdmin />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route path = "*" component={() => "404 NOT FOUND"}/>
                     </Switch>
                 </UserContext.Provider>

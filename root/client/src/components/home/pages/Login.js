@@ -42,7 +42,7 @@ export default function Login () {
                         });
                         localStorage.setItem("auth-token", loginRes.data.token);
                         sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
-                        console.log("ZZ" + loginRes.data.user.role)
+                        // console.log("ZZ" + loginRes.data.user.role)
                     if (loginRes.data.user.role === "admin"){
                             history.push("/users")
                         }
