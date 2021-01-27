@@ -49,11 +49,13 @@ export default function Register () {
             <HomeNavigationBar/>
             <div className="login-registration">
                 <div className="box" style={{height: "650px"}}>
-                    {error && (
-                        <ErrorNotice message={error} clearError={() => setError(undefined)} />
-                    )}
                     <div className="form">
                         <h2>Register</h2>
+                        <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 10}}>
+                            {error && (
+                                <ErrorNotice message={error} clearError={() => setError(undefined)} />
+                            )}
+                        </div>
                         <form onSubmit={submit}>
                             <label htmlFor="register-first-name"/>
                             <div className="inputBox">
