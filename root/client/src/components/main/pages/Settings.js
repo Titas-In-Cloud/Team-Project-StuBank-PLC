@@ -188,7 +188,7 @@ export default function Settings () {
                         </div>
                     </form>}
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 20, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={handleDeleteAccount()}>
+                        <btn className="button-account" disableElevation={true} onClick={handleDeleteAccount}>
                             Click here to delete account</btn>
                     </div>
                 </div>
