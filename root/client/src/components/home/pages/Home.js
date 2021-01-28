@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import Logo from "../../images/testimonial-profile-picture.jpg";
 
 export default function Home() {
+    sessionStorage.clear()
     return (
         <div>
             <HomeNavigationBar />
