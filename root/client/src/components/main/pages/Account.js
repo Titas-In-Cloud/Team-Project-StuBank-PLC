@@ -98,9 +98,9 @@ export default function Account () {
                     <p style={{color: "black", fontSize: 18, paddingLeft: 30, paddingTop: 5, paddingBottom: 10}}>
                         Your total EUR balance: €{Number(balanceEUR).toFixed(2)}</p>
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 40, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={() => {
+                        <button className="button-account" style={{width: 160, fontSize: 16}} onClick={() => {
                             setShowTransfer(!showTransfer)
-                        }}>New Transfer</btn>
+                        }}>New Transfer</button>
                     </div>
                     {showTransfer && (
                         <form className="form-account" onSubmit={submitTransfer}>
@@ -141,9 +141,9 @@ export default function Account () {
 
                         </form>)}
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 30, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={() => {
+                        <button className="button-account" style={{width: 220, fontSize: 16}} onClick={() => {
                             setShowConvert(!showConvert)
-                        }}>Convert Currencies</btn>
+                        }}>Convert Currencies</button>
                     </div>
                     {showConvert && (
                         <form className="form-account" onSubmit={submitConvert}>
@@ -188,10 +188,7 @@ export default function Account () {
                                            type="submit" value="Submit"/>
                                 </div>
                             </div>
-                        </form>
-                    )
-
-                    }
+                        </form>)}
                 </div>
             </div>
         </div>

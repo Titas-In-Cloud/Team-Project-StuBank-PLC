@@ -51,10 +51,10 @@ function NavigationBar(){
                 </div>
             </div>
             <div className="button">
-                <btn style={{cursor: "pointer"}} onClick={() =>{ if (window.confirm('Do you want to logout?')) logout() }}>
+                <div style={{cursor: "pointer"}} onClick={() =>{ if (window.confirm('Do you want to logout?')) logout() }}>
                     <img className="image-logout" src={LogoutLogo} alt="Logout"/>
                     <p style={{color: "#ff1b1b" }}>Logout</p>
-                </btn>
+                </div>
             </div>
         </div>
     )
