@@ -31,9 +31,9 @@ to do this because there will be no way to login without it after you exit the a
 Go to **App Store** on your iPhone or **Google Play Store** on your Android device and search for 
 **Google Authenticator**. Click on the top option and install.
 
-<img src="client/public/images/Play%20Store%20Search.jpg" width="30%" alt="">
+<img src="root/client/public/images/Play Store Search.jpg" width="30%" alt="">
 
-<img src="client/public/images/Play%20Store%20Authenticator.jpg" width="30%" alt="">
+<img src="root/client/public/images/Play Store Authenticator.jpg" width="30%" alt="">
 
 After installation, open **Authenticator** app and click the plus symbol on the bottom right to scan the bar code. Once
 it's done it is all set up and there should be 6 number code which changes each 30 seconds. This will be used the next 
