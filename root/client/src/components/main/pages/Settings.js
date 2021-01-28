@@ -43,7 +43,7 @@ export default function Settings () {
                     history.push('/')
                 )
         } catch (err) {
-            console.log(err);
+            err.response.data.msg && setErrorAmend(err.response.data.msg)
         }
     }
 

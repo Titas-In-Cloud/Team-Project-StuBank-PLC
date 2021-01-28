@@ -10,10 +10,9 @@ import ProtectedRouteAdmin from "./ProtectedRouteAdmin";
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    console.log("auth status: " + isAuthenticated)
 
         const checkAuth = async () => {
-            const token = localStorage.getItem('auth-token');
+            const token = sessionStorage.getItem('auth-token');
             const request = Axios.create({
                 headers: {
                     "x-auth-token": token
@@ -21,7 +20,6 @@ export default function App() {
             });
             await request.post('http://localhost:5000/users/tokenIsValid')
                 .then( res => {
-                    console.log("response: " + res.data)
                 if (res.data) {
                 setIsAuthenticated(true);
             }
