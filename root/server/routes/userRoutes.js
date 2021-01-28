@@ -385,12 +385,12 @@ function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbo
     let date = new Date()
     date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
     balanceTo = aesEncrypt(parseFloat(Number(aesDecrypt(balanceTo))
-        + Number(money.convert(Number(amount), {from: String(currencyFrom), to: (currencyTo)}))).toFixed(2))
+        + Number(money.convert(Number(amount), {from: currencyFrom, to: (currencyTo)}))).toFixed(2))
     balanceFrom = aesEncrypt(parseFloat(Number(aesDecrypt(balanceFrom))
         - Number(amount)).toFixed(2))
     const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(String(amount)), account: personalID,
         balance: balanceFrom, currency: symbolFrom}
-    const transactionIn = {date, amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: "GBP", to: "USD"})).toFixed(2))),
+    const transactionIn = {date, amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: currencyFrom, to: currencyTo})).toFixed(2))),
         amountOut: aesEncrypt(''), account: personalID, balance: balanceTo, currency: symbolTo}
     return{balanceTo, balanceFrom, transactionOut, transactionIn}
 }
