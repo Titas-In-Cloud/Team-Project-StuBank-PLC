@@ -1,6 +1,4 @@
 export { default as Home } from "./home/pages/Home";
-export { default as Features } from "./home/pages/Features";
-export { default as AboutUs } from "./home/pages/AboutUs";
 export { default as FAQ } from "./home/pages/FAQ";
 export { default as Login } from "./home/pages/Login";
 export { default as Register } from "./home/pages/Register";

@@ -1,10 +1,17 @@
 const router = require ("express").Router();
 const User = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const speakeasy = require("speakeasy");
-
+const money = require("money");
+const oxr = require("open-exchange-rates")
+oxr.set({ app_id: 'ec27af52e4214a3eae3323dd2710dee0' })
+oxr.latest(function() {
+    // Apply exchange rates and base rate to `fx` library object:
+    money.rates = oxr.rates;
+    money.base = oxr.base;
+});
 //encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
 function aesEncrypt(data) {
     const crypto = require('crypto');
@@ -34,12 +41,12 @@ async function getUserData(PID){
         transaction.amountOut = aesDecrypt(new Map([['data', transaction.amountOut.data],['iv', transaction.amountOut.iv],['key', transaction.amountOut.key]]))
         transaction.balance = aesDecrypt(new Map([['data', transaction.balance.data],['iv', transaction.balance.iv],['key', transaction.balance.key]]))
         if(transaction.amountIn !== ''){
-            transaction.amountIn = '£' + parseFloat(transaction.amountIn).toFixed(2)
+            transaction.amountIn = transaction.currency + parseFloat(transaction.amountIn).toFixed(2)
         }
         if(transaction.amountOut !== ''){
-            transaction.amountOut = '£' + parseFloat(transaction.amountOut).toFixed(2)
+            transaction.amountOut = transaction.currency + parseFloat(transaction.amountOut).toFixed(2)
         }
-        transaction.balance = '£' + transaction.balance
+        transaction.balance = transaction.currency + transaction.balance
     }
     return {
         user: {
@@ -49,52 +56,49 @@ async function getUserData(PID){
             phoneNum: {data: aesDecrypt(userData.phoneNum)},
             firstName: {data: aesDecrypt(userData.firstName)},
             lastName: {data: aesDecrypt(userData.lastName)},
-            accountBalance: {data: aesDecrypt(userData.accountBalance)},
+            accountBalanceGBP: {data: aesDecrypt(userData.accountBalanceGBP)},
+            accountBalanceUSD: {data: aesDecrypt(userData.accountBalanceUSD)},
+            accountBalanceEUR: {data: aesDecrypt(userData.accountBalanceEUR)},
             recipients: userData.recipients,
             transactions: userData.transactions,
             totpSecret: JSON.parse(aesDecrypt(userData.totpSecret)),
             cardNumber: {data: aesDecrypt(userData.cardNumber)},
             CVV: {data: aesDecrypt(userData.CVV)},
-            frozenCard: userData.frozenCard
+            frozenCard: userData.frozenCard,
+            role: userData.role
         }
     }
 }
 router.post("/register", async(req, res) => {
     try {
-        let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName} = req.body;
+        let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName, role} = req.body;
 
         // validate
-        if(!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
+        if (!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
-        if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
+        if (!(firstName.match(/^[A-Za-z\-]+$/)) || (!(lastName.match(/^[A-Za-z\-]+$/))))
             return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
-        if(password !== passwordCheck)
-            return res.status(400).json({msg: "Enter password twice to ensure password has been entered correctly"});
+        if (password !== passwordCheck)
+            return res.status(400).json({msg: "Passwords do not match"});
 
-        const emails = await User.find({},{email: 1});
-        for(let item of emails){
-            if (aesDecrypt(item.email) === email){
+        const emails = await User.find({}, {email: 1});
+        for (let item of emails) {
+            if (aesDecrypt(item.email) === email) {
                 return res.status(400).json({msg: "An account with this email already exists."});
             }
         }
-        const phonenums = await User.find({},{phoneNum: 1});
-        for(let item of phonenums){
-            if (aesDecrypt(item.phoneNum) === phoneNum){
+        const phonenums = await User.find({}, {phoneNum: 1});
+        for (let item of phonenums) {
+            if (aesDecrypt(item.phoneNum) === phoneNum) {
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
         }
-        /*const existingEmail = await User.findOne({email: email});
-        if(existingEmail)
-            return res.status(400).json({msg: "An account with this email already exists."});*/
         const existingPID = await User.findOne({personalID: personalID});
-        if(existingPID)
+        if (existingPID)
             return res.status(400).json({msg: "An account with this personal ID already exists."});
-        /*const existingPhoneNum = await User.findOne({phoneNum: phoneNum});
-        if(existingPhoneNum)
-            return res.status(400).json({msg: "An account with this phone number already exists."});*/
-        // if (!(phone.match(/\d{2}-\d{4}-\d{7}$/))) {
-        //     res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number of the form XX--XXXX-XXXXXXX"});
-        // }
+        if (!(phoneNum.match(/^(07\d{8,12}|447\d{7,11})$/))) {
+            return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number (e.g 07123123123 or 447123123123)"});
+        }
         if (!(email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)))
             return res.status(400).json({msg: "Email address is not valid, please enter a valid email, e.g. example@email.com"});
         if (!(password.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
@@ -115,15 +119,24 @@ router.post("/register", async(req, res) => {
             phoneNum: aesEncrypt(phoneNum),
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
-            accountBalance: aesEncrypt('50'),
+            accountBalanceGBP: aesEncrypt('50'),
+            accountBalanceUSD: aesEncrypt('50'),
+            accountBalanceEUR: aesEncrypt('50'),
             totpSecret: aesEncrypt(JSON.stringify(totpSecret)),
             cardNumber: aesEncrypt(''),
             CVV: aesEncrypt(''),
-            frozenCard: false
+            frozenCard: false,
+            role: role
         })
         const savedUser = await newUser.save();
-        res.json(savedUser);
-    } catch(err){
+        const token = jwt.sign({id: savedUser._id}, process.env.JWT_PWD)
+        const userData = await getUserData(personalID)
+        res.json({
+            token,
+            user: userData.user
+        });
+
+} catch(err){
         res.status(500).json({error: err.message} );
     }
 
@@ -134,7 +147,6 @@ router.post("/login", async (req, res) => {
         //validate
         if ((!personalID || !password))
             return res.status(400).json({msg: "One or more required fields are blank"})
-
         const user = await User.findOne({personalID: personalID});
         if (!user)
             return res.status(400).json({msg: "This user does not exist"});
@@ -142,7 +154,6 @@ router.post("/login", async (req, res) => {
         if (!matchTrue)
             return res.status(400).json({msg: "Incorrect password"})
         const token = jwt.sign({id: user._id}, process.env.JWT_PWD)
-
         const userData = await getUserData(personalID)
         res.json({
             token,
@@ -181,9 +192,23 @@ router.post("/tokenIsValid", async (req, res) =>{
     }
 })
 
+function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, currency){
+    let date = new Date()
+    date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
+    payerBalance = parseFloat(Number(aesDecrypt(payerBalance)) - Number(amount)).toFixed(2)
+    if (Number(payerBalance) < 0) {return false}
+    else {payerBalance = aesEncrypt(payerBalance)}
+    payeeBalance = aesEncrypt((parseFloat(aesDecrypt(payeeBalance)) + parseFloat(amount)).toFixed(2))
+    const transactionIn = {date, amountIn: aesEncrypt(amount), amountOut: aesEncrypt(''), account: payerID,
+        balance: payeeBalance, currency}
+    const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(amount), account: payeeID.value,
+        balance: payerBalance, currency}
+    return {payeeBalance, payerBalance, transactionIn, transactionOut}
+}
+
 router.post("/transfer", async (req, res) =>{
     try{
-        const {payerID, payeeID, amount} = req.body
+        const {payerID, payeeID, amount, currency} = req.body
         if (payerID === payeeID.value)
             return res.status(400).json({msg: "This is your account. Please choose another"});
         if (!(payeeID.value.match(/^\d{11}$/)))
@@ -192,27 +217,46 @@ router.post("/transfer", async (req, res) =>{
             return res.status(400).json({msg: "Please enter a monetary value"});
         let payee
         payee = await User.findOne({personalID: payeeID.value});
-        if (payee) {payee.accountBalance = aesEncrypt((parseFloat(aesDecrypt(payee.accountBalance)) +
-            parseFloat(amount)).toFixed(2))}
-        else{return res.status(400).json({msg: "The payee doesn't exist"})}
-        const date = new Date()
-        payee.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(amount),
-            amountOut: aesEncrypt(''), account: payerID, balance: payee.accountBalance})
-        let payer
-        payer = await User.findOne({personalID: payerID});
-        payer.accountBalance = aesEncrypt((parseFloat(aesDecrypt(payer.accountBalance)) -
-            parseFloat(amount)).toFixed(2))
-        if (payer.accountBalance < 0)
-            return res.status(400).json({msg: "Insufficient funds"});
-        payer.transactions.push({date: aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' +
-                ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear())), amountIn: aesEncrypt(''),
-            amountOut: aesEncrypt(amount), account: payeeID.value, balance: payer.accountBalance})
-        if (payeeID.__isNew__ !== undefined)
-            payer.recipients.push({label: payeeID.label, value: payeeID.value})
-        payee.save()
-        payer.save()
-        res.json()
+        if (payee) {
+            let payer
+            payer = await User.findOne({personalID: payerID});
+            let data
+            switch (currency) {
+                case '£':
+                    data = transferMoney(payee.accountBalanceGBP, payer.accountBalanceGBP, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceGBP = data.payeeBalance
+                        payer.accountBalanceGBP = data.payerBalance
+                    }
+                    break
+                case '$':
+                    data = transferMoney(payee.accountBalanceUSD, payer.accountBalanceUSD, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceUSD = data.payeeBalance
+                        payer.accountBalanceUSD = data.payerBalance
+                    }
+                    break
+                case '€':
+                    data = transferMoney(payee.accountBalanceEUR, payer.accountBalanceEUR, payeeID, payerID.value, amount, currency)
+                    if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
+                    else {
+                        payee.accountBalanceEUR = data.payeeBalance
+                        payer.accountBalanceEUR = data.payerBalance
+                    }
+                    break
+            }
+            payer.transactions.push(data.transactionOut)
+            payee.transactions.push(data.transactionIn)
+            if (payeeID.__isNew__ !== undefined)
+                payer.recipients.push({label: payeeID.label, value: payeeID.value})
+            payee.save()
+            payer.save()
+            res.json()
+        }
+        else
+            {return res.status(400).json({msg: "The payee doesn't exist"})}
     }
     catch(err) {
         res.status(500).json({ error: err.message });
@@ -276,7 +320,8 @@ router.post("/totp-validate", (request, response, next) => {
 
 router.post("/amendDetails", async (req, res) =>{
     try{
-        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID} = req.body;
+        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
+            accountBalanceEUR} = req.body;
         let oldUser
         oldUser = await User.findOne({personalID})
         // validate
@@ -318,6 +363,15 @@ router.post("/amendDetails", async (req, res) =>{
         oldUser.firstName = aesEncrypt(firstName)
         oldUser.lastName = aesEncrypt(lastName)
         oldUser.phoneNum = aesEncrypt(phoneNum)
+        if (accountBalanceGBP) {
+            oldUser.accountBalanceGBP = aesEncrypt(parseFloat(accountBalanceGBP).toFixed(2))
+        }
+        if (accountBalanceUSD) {
+            oldUser.accountBalanceUSD = aesEncrypt(parseFloat(accountBalanceUSD).toFixed(2))
+        }
+        if (accountBalanceEUR) {
+            oldUser.accountBalanceEUR = aesEncrypt(parseFloat(accountBalanceEUR).toFixed(2))
+        }
         await oldUser.save()
         res.json()
     }
@@ -326,4 +380,104 @@ router.post("/amendDetails", async (req, res) =>{
     }
 })
 
+function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbolTo, symbolFrom, amount, personalID){
+    let date = new Date()
+    date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
+    balanceTo = aesEncrypt(parseFloat(Number(aesDecrypt(balanceTo))
+        + Number(money.convert(Number(amount), {from: currencyFrom, to: (currencyTo)}))).toFixed(2))
+    balanceFrom = aesEncrypt(parseFloat(Number(aesDecrypt(balanceFrom))
+        - Number(amount)).toFixed(2))
+    const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(String(amount)), account: personalID,
+        balance: balanceFrom, currency: symbolFrom}
+    const transactionIn = {date, amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: currencyFrom, to: currencyTo})).toFixed(2))),
+        amountOut: aesEncrypt(''), account: personalID, balance: balanceTo, currency: symbolTo}
+    return{balanceTo, balanceFrom, transactionOut, transactionIn}
+}
+
+router.post("/convert", async (req, res) =>{
+    try{
+        const {personalID, amount, to, from} = req.body
+        if (!(amount.match(/^\d+[.]\d{1,2}$/)) && !(amount.match(/^\d+$/)))
+            return res.status(400).json({msg: "Please enter a monetary value"});
+        if (to === from)
+            return res.status(400).json({msg: "Please choose two different currencies"});
+        let user
+        user = await User.findOne({personalID: personalID});
+        let data
+        switch (from){
+            case '£':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceGBP)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
+                switch (to) {
+                    case '$':
+                        data = convertCurrency(user.accountBalanceUSD, user.accountBalanceGBP, "USD", "GBP", to, from, amount, personalID)
+                        user.accountBalanceUSD = data.balanceTo
+                        user.accountBalanceGBP = data.balanceFrom
+                        break
+                    case '€':
+                        data = convertCurrency(user.accountBalanceEUR, user.accountBalanceGBP, "EUR", "GBP", to, from, amount, personalID)
+                        user.accountBalanceEUR = data.balanceTo
+                        user.accountBalanceGBP = data.balanceFrom
+                        break
+                }
+                break
+            case '$':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceUSD)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
+                switch (to) {
+                    case '£':
+                        data = convertCurrency(user.accountBalanceGBP, user.accountBalanceUSD, "GBP", "USD", to, from, amount, personalID)
+                        user.accountBalanceGBP = data.balanceTo
+                        user.accountBalanceUSD = data.balanceFrom
+                        break
+                    case '€':
+                        data = convertCurrency(user.accountBalanceEUR, user.accountBalanceUSD, "EUR", "USD", to, from, amount, personalID)
+                        user.accountBalanceEUR = data.balanceTo
+                        user.accountBalanceUSD = data.balanceFrom
+                        break
+                }
+                break
+            case '€':
+                if (parseFloat(Number(aesDecrypt(user.accountBalanceEUR)) - Number(amount)).toFixed(2) < 0)
+                    return res.status(400).json({msg: "Insufficient funds"});
+                switch (to) {
+                    case '£':
+                        data = convertCurrency(user.accountBalanceGBP, user.accountBalanceEUR, "GBP", "EUR", to, from, amount, personalID,)
+                        user.accountBalanceGBP = data.balanceTo
+                        user.accountBalanceEUR = data.balanceFrom
+                        break
+                    case '$':
+                        data = convertCurrency(user.accountBalanceUSD, user.accountBalanceEUR, "USD", "EUR", to, from, amount, personalID)
+                        user.accountBalanceUSD = data.balanceTo
+                        user.accountBalanceEUR = data.balanceFrom
+                        break
+                }
+                break
+        }
+        user.transactions.push(data.transactionOut)
+        user.transactions.push(data.transactionIn)
+        user.save()
+        res.json()
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
+
+router.post("/getAll", async (req, res) => {
+    try{
+        let data = await User.find({}, {personalID: 1, firstName: 1, lastName: 1, role: 1, accountBalanceGBP: 1, accountBalanceUSD: 1, accountBalanceEUR: 1});
+        for(let user of data){
+            user.firstName = {data: aesDecrypt(user.firstName)}
+            user.lastName = {data: aesDecrypt(user.lastName)}
+            user.accountBalanceGBP = {data: aesDecrypt(user.accountBalanceGBP)}
+            user.accountBalanceUSD = {data: aesDecrypt(user.accountBalanceUSD)}
+            user.accountBalanceEUR = {data: aesDecrypt(user.accountBalanceEUR)}
+        }
+        res.json(data)
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
 module.exports = router;

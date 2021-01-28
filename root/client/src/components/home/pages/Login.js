@@ -4,13 +4,12 @@ import {Link, useHistory} from "react-router-dom";
 import UserContext from "../../../context/UserContext";
 import ErrorNotice from "../../misc/ErrorNotice";
 import Axios from "axios";
-
 import UserLogo from "../../images/user-logo.png";
 import LockLogo from "../../images/lock-logo.png";
 
 export default function Login () {
-    const [personalID, setPersonalID] = useState();
-    const [password, setPassword] = useState();
+    const [personalID, setPersonalID] = useState(undefined);
+    const [password, setPassword] = useState(undefined);
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
     const history = useHistory();
@@ -23,13 +22,45 @@ export default function Login () {
                 "http://localhost:5000/users/login",
                 loginUser
             );
-            setUserData({
-                token: loginRes.data.token,
-                user: loginRes.data.user,
-            });
-            localStorage.setItem("auth-token", loginRes.data.token);
-            sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/overview");
+
+
+            if (loginRes.data.user.role === "admin") {
+                setUserData({
+                    token: loginRes.data.token,
+                    user: loginRes.data.user,
+                });
+                sessionStorage.setItem("auth-token", loginRes.data.token);
+                sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
+                history.push("/users")
+            }
+            else {
+                let totpToken = prompt("Please enter the google authenticator code: ");
+                //Get the totpSecret from the server-side
+                let totpSecret = loginRes.data.user.totpSecret.base32;
+                const totpData = {
+                    "secret": totpSecret,
+                    "token": totpToken
+                }
+
+                //Validate the google authenticator token
+                await Axios.post('http://localhost:5000/users/totp-validate', totpData)
+                    .then(res => {
+                            // Set the user data to local and session storage if the token is valid
+                            if (res.data.valid) {
+                                setUserData({
+                                    token: loginRes.data.token,
+                                    user: loginRes.data.user,
+                                });
+                                sessionStorage.setItem("auth-token", loginRes.data.token);
+                                sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
+                                // if (loginRes.data.user.role === "admin"){
+                                //         history.push("/users")
+                                //     }
+                                history.push("/overview")
+                            }
+                        }
+                    )
+            }
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
@@ -40,11 +71,13 @@ export default function Login () {
             <HomeNavigationBar/>
             <div className="login-registration">
                 <div className="box" >
-                    {error && (
-                        <ErrorNotice message={error} clearError={() => setError(undefined)} />
-                    )}
                     <div className="form" onSubmit={submit}>
                         <h2>Login</h2>
+                        <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 10}}>
+                            {error && (
+                                <ErrorNotice message={error} clearError={() => setError(undefined)} />
+                            )}
+                        </div>
                         <form>
                             <label htmlFor="login-personal-ID"/>
                             <div className="inputBox">

@@ -11,34 +11,34 @@ import TelephoneLogo from "../../images/telephone-logo.png";
 import EmailLogo from "../../images/email-logo.png";
 
 export default function Register () {
-    const [email, setEmail] = useState();
-    const [firstName, setFirstName] = useState();
-    const [lastName, setLastName] = useState();
-    const [password, setPassword] = useState();
-    const [passwordCheck, setPasswordCheck] = useState();
-    const [personalID, setPersonalID] = useState();
-    const [phoneNum, setPhoneNum] = useState();
+    const [email, setEmail] = useState(undefined);
+    const [firstName, setFirstName] = useState(undefined);
+    const [lastName, setLastName] = useState(undefined);
+    const [password, setPassword] = useState(undefined);
+    const [passwordCheck, setPasswordCheck] = useState(undefined);
+    const [personalID, setPersonalID] = useState(undefined);
+    const [phoneNum, setPhoneNum] = useState(undefined);
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
+    const role = "user";
     const history = useHistory();
 
     const submit = async (e) => {
         e.preventDefault();
-
         try {
-            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum };
-            await Axios.post("http://localhost:5000/users/register", newUser);
-            const loginRes = await Axios.post("http://localhost:5000/users/login", {
-                personalID,
-                password,
-            });
+            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum, role};
+            const registerUser = await Axios.post("http://localhost:5000/users/register", newUser);
+            // const loginRes = await Axios.post("http://localhost:5000/users/login", {
+            //     personalID,
+            //     password,
+            // });
             setUserData({
-                token: loginRes.data.token,
-                user: loginRes.data.user,
+                token: registerUser.data.token,
+                user: registerUser.data.user,
             });
-            localStorage.setItem("auth-token", loginRes.data.token);
-            sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
-            history.push("/");
+            sessionStorage.setItem("auth-token", registerUser.data.token);
+            sessionStorage.setItem("userData", JSON.stringify(registerUser.data.user));
+            history.push("/overview");
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
@@ -49,11 +49,13 @@ export default function Register () {
             <HomeNavigationBar/>
             <div className="login-registration">
                 <div className="box" style={{height: "650px"}}>
-                    {error && (
-                        <ErrorNotice message={error} clearError={() => setError(undefined)} />
-                    )}
                     <div className="form">
                         <h2>Register</h2>
+                        <div style={{fontSize: 14, color: "#FF5454", paddingLeft: 10, paddingBottom: 10}}>
+                            {error && (
+                                <ErrorNotice message={error} clearError={() => setError(undefined)} />
+                            )}
+                        </div>
                         <form onSubmit={submit}>
                             <label htmlFor="register-first-name"/>
                             <div className="inputBox">

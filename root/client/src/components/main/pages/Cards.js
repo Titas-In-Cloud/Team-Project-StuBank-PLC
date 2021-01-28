@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {MainNavigationBar} from "../../";
-import {Button} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice";
 import Axios from "axios";
+import CardTemplate from "../../images/bank-card-template.png";
 
 export default function Cards () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
@@ -51,43 +51,52 @@ export default function Cards () {
     }
 
     return (
-        <div className="main-background">
+        <div className="top-bar">
             <MainNavigationBar />
-            <section className="main-background">
-                <div className="centered-text-default">
-                    <h1>Cards</h1>
+            <div className="main-background">
+                <div className="small-bank-box">
+                    <h1>Virtual Cards</h1>
                     <div>
-                        <Button variant={"contained"} disableElevation={true} onClick={() => {
-                            generateNumbers()
-                        }}>Generate Card</Button>
+                        <div style={{paddingBottom: 20, paddingTop: 20, paddingLeft: 30}}>
+                            <button className="button-account" style={{width: 220, fontSize: 16, height: 40}}
+                                 onClick={() => {generateNumbers()}}>Generate New Card</button>
+                        </div>
+                        <form className="form-account" onSubmit = {submitCards}>
+                            {errorCards && (<ErrorNotice message={errorCards} clearError={() => setErrorCards(undefined)}/>)}
+                            <label>Card Number: </label>
+                            <div style={{paddingBottom: 10, paddingTop: 3}}>
+                                <input
+                                    type="text"
+                                    name="Card Number"
+                                    readOnly={true}
+                                    value ={cardNumber}
+                                />
+                            </div>
+
+                            <label>CVV: </label>
+                            <div style={{paddingBottom: 10, paddingTop: 3}}>
+                                <input
+                                    type="text"
+                                    name="CVV"
+                                    value = {CVV}
+                                    readOnly={true}
+                                />
+                            </div>
+
+                            <div style={{paddingTop: 5, paddingLeft: 10}}>
+                                <input className="button-account" style={{width: 110, fontSize: 12}}
+                                       type="submit" value="Save"/>
+                            </div>
+                        </form>
                     </div>
-                    <form className="Form1" onSubmit = {submitCards}>
-                        {errorCards && (<ErrorNotice message={errorCards} clearError={() => setErrorCards(undefined)}/>)}
-                        <label>Card Number: </label>
-                        <input
-                            type="text"
-                            name="Card Number"
-                            readOnly={true}
-                            value ={cardNumber}
-                        />
-                        <label>CVV: </label>
-                        <input
-                            type="text"
-                            name="CVV"
-                            value = {CVV}
-                            readOnly={true}
-                        />
-                        <label>Freeze Card: </label>
-                        <input
-                            type="checkbox"
-                            name="Freeze"
-                            defaultChecked = {frozen}
-                            onChange = {(e) => setFrozen(!frozen)}
-                        />
-                        <input type="submit" value="Submit"/>
-                    </form>
+                    <div>
+                        <img src={CardTemplate} style={{width: 560}} alt=""/>
+                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 180, left: 60}}>{user.cardNumber.data}</p>
+                        <p style={{color: "#fafafa", fontSize: 20, position: "relative", bottom: 179, left: 75}}>{user.CVV.data}</p>
+                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 155, left: 65}}>{user.firstName.data} {user.lastName.data}</p>
+                    </div>
                 </div>
-            </section>
+            </div>
         </div>
     )
 }
