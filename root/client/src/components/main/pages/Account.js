@@ -17,9 +17,9 @@ export default function Account () {
     const [balanceUSD, setBalanceUSD] = useState(user.accountBalanceUSD.data);
     const [balanceEUR, setBalanceEUR] = useState(user.accountBalanceEUR.data);
     const [recipient, setRecipient] = useState({label: '', value: ''});
-    const [currency, setCurrency] = useState('£')
-    const [currencyTo, setCurrencyTo] = useState('£')
-    const [currencyFrom, setCurrencyFrom] = useState('£')
+    const [currency, setCurrency] = useState('£');
+    const [currencyTo, setCurrencyTo] = useState('£');
+    const [currencyFrom, setCurrencyFrom] = useState('£');
 
     async function updateData() {
         try {

@@ -23,35 +23,44 @@ export default function Login () {
                 loginUser
             );
 
-            let totpToken = prompt("Please enter the google authenticator code: ");
-            //Get the totpSecret from the server-side
-            let totpSecret = loginRes.data.user.totpSecret.base32;
-            const totpData = {
-                "secret": totpSecret,
-                "token": totpToken
-            }
 
-            //Validate the google authenticator token
-            await Axios.post('http://localhost:5000/users/totp-validate', totpData)
-                .then(res => {
-                    // Set the user data to local and session storage if the token is valid
-                    if (res.data.valid) {
-                        setUserData({
-                            token: loginRes.data.token,
-                            user: loginRes.data.user,
-                        });
-                        localStorage.setItem("auth-token", loginRes.data.token);
-                        sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
-                        // console.log("ZZ" + loginRes.data.user.role)
-                    if (loginRes.data.user.role === "admin"){
-                            history.push("/users")
-                        }
-                    else{
-                        history.push("/overview")
-                        }
-                    }
+            if (loginRes.data.user.role === "admin") {
+                setUserData({
+                    token: loginRes.data.token,
+                    user: loginRes.data.user,
+                });
+                localStorage.setItem("auth-token", loginRes.data.token);
+                sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
+                history.push("/users")
+            }
+            else {
+                    let totpToken = prompt("Please enter the google authenticator code: ");
+                //Get the totpSecret from the server-side
+                let totpSecret = loginRes.data.user.totpSecret.base32;
+                const totpData = {
+                    "secret": totpSecret,
+                    "token": totpToken
                 }
-                )
+
+                //Validate the google authenticator token
+                await Axios.post('http://localhost:5000/users/totp-validate', totpData)
+                    .then(res => {
+                            // Set the user data to local and session storage if the token is valid
+                            if (res.data.valid) {
+                                setUserData({
+                                    token: loginRes.data.token,
+                                    user: loginRes.data.user,
+                                });
+                                localStorage.setItem("auth-token", loginRes.data.token);
+                                sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user))
+                                // if (loginRes.data.user.role === "admin"){
+                                //         history.push("/users")
+                                //     }
+                                history.push("/overview")
+                            }
+                        }
+                    )
+            }
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);
         }
