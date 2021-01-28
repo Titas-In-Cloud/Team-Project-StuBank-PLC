@@ -15,13 +15,13 @@ export default function Users () {
     const [personalID, setPersonalID] = useState(undefined);
     const [showAmend, setShowAmend] = useState(false);
     const [errorAmend, setErrorAmend] = useState();
-        const [email, setEmail] = useState(userDataToAmend.email.data);
-        const [firstName, setFirstName] = useState(userDataToAmend.firstName.data);
-        const [lastName, setLastName] = useState(userDataToAmend.lastName.data);
-        const [passwordOld, setPasswordOld] = useState(undefined);
-        const [passwordNew, setPasswordNew] = useState(undefined);
-        const [passwordCheck, setPasswordCheck] = useState(undefined);
-        const [phoneNum, setPhoneNum] = useState(userDataToAmend.phoneNum.data);
+    const [email, setEmail] = useState(userDataToAmend.email.data);
+    const [firstName, setFirstName] = useState(userDataToAmend.firstName.data);
+    const [lastName, setLastName] = useState(userDataToAmend.lastName.data);
+    const [phoneNum, setPhoneNum] = useState(userDataToAmend.phoneNum.data);
+    const [accountBalanceGBP, setBalanceGBP] = useState(userDataToAmend.accountBalanceGBP.data);
+    const [accountBalanceUSD, setBalanceUSD] = useState(userDataToAmend.accountBalanceUSD.data);
+    const [accountBalanceEUR, setBalanceEUR] = useState(userDataToAmend.accountBalanceEUR.data);
     async function updateData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
@@ -30,10 +30,10 @@ export default function Users () {
             setEmail(userDataToAmend.email.data)
             setFirstName(userDataToAmend.firstName.data)
             setLastName(userDataToAmend.lastName.data)
-            setPasswordOld(undefined)
-            setPasswordNew(undefined)
-            setPasswordCheck(undefined)
             setPhoneNum(userDataToAmend.phoneNum.data)
+            setBalanceGBP(userDataToAmend.accountBalanceGBP.data)
+            setBalanceUSD(userDataToAmend.accountBalanceUSD.data)
+            setBalanceEUR(userDataToAmend.accountBalanceEUR.data)
             sessionStorage.setItem("userData", JSON.stringify(userDataToAmend))
         } catch (err) {
             err.response.data.msg && setErrorAmend(err.response.data.msg)
@@ -55,13 +55,11 @@ export default function Users () {
         updateData();
     }, []);
 
-    function assignUser(){
-    }
-
     async function submitAmend(e){
         e.preventDefault()
         try {
-            const data = {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID}
+            const data = {email, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
+                accountBalanceEUR}
             await Axios.post("http://localhost:5000/users/amendDetails", data)
             await updateData()
         } catch (err) {
@@ -116,22 +114,26 @@ export default function Users () {
                         defaultValue={userDataToAmend.phoneNum.data}
                         onChange={(e) => setPhoneNum(e.target.value)}
                     />
-                    <label htmlFor="passwordOld">Current Password</label>
+                    <label htmlFor="gbp-balance">GBP Balance</label>
                     <input
-                        id="passwordOld"
-                        type="password"
-                        onChange={(e) => setPasswordOld(e.target.value)}
+                        id="gbp-balance"
+                        type="text"
+                        defaultValue={userDataToAmend.accountBalanceGBP.data}
+                        onChange={(e) => setBalanceGBP(e.target.value)}
                     />
-                    <label htmlFor="passwordNew">New Password</label>
+                    <label htmlFor="usd-balance">USD Balance</label>
                     <input
-                        id="passwordNew"
-                        type="password"
-                        onChange={(e) => setPasswordNew(e.target.value)}
+                        id="usd-balance"
+                        type="text"
+                        defaultValue={userDataToAmend.accountBalanceUSD.data}
+                        onChange={(e) => setBalanceUSD(e.target.value)}
                     />
+                    <label htmlFor="eur-balance">EUR Balance</label>
                     <input
-                        type="password"
-                        placeholder="Verify password"
-                        onChange={(e) => setPasswordCheck(e.target.value)}
+                        id="eur-balance"
+                        type="text"
+                        defaultValue={userDataToAmend.accountBalanceEUR.data}
+                        onChange={(e) => setBalanceEUR(e.target.value)}
                     />
                     <input type="submit" value="Amend"/>
                 </form>}

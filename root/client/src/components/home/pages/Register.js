@@ -20,13 +20,13 @@ export default function Register () {
     const [phoneNum, setPhoneNum] = useState(undefined);
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
+    const role = "user";
     const history = useHistory();
 
     const submit = async (e) => {
         e.preventDefault();
-
         try {
-            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum };
+            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum, role };
             await Axios.post("http://localhost:5000/users/register", newUser);
             const loginRes = await Axios.post("http://localhost:5000/users/login", {
                 personalID,

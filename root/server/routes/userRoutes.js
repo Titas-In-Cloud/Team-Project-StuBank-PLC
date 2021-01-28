@@ -71,7 +71,7 @@ async function getUserData(PID){
 }
 router.post("/register", async(req, res) => {
     try {
-        let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName} = req.body;
+        let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName, role} = req.body;
 
         // validate
         if(!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
@@ -126,7 +126,7 @@ router.post("/register", async(req, res) => {
             cardNumber: aesEncrypt(''),
             CVV: aesEncrypt(''),
             frozenCard: false,
-            role: "user"
+            role: role
         })
         const savedUser = await newUser.save();
         res.json(savedUser);
@@ -322,7 +322,8 @@ router.post("/totp-validate", (request, response, next) => {
 
 router.post("/amendDetails", async (req, res) =>{
     try{
-        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID} = req.body;
+        let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
+            accountBalanceEUR} = req.body;
         let oldUser
         oldUser = await User.findOne({personalID})
         // validate
@@ -364,6 +365,9 @@ router.post("/amendDetails", async (req, res) =>{
         oldUser.firstName = aesEncrypt(firstName)
         oldUser.lastName = aesEncrypt(lastName)
         oldUser.phoneNum = aesEncrypt(phoneNum)
+        oldUser.accountBalanceGBP = aesEncrypt(accountBalanceGBP)
+        oldUser.accountBalanceUSD = aesEncrypt(accountBalanceUSD)
+        oldUser.accountBalanceEUR = aesEncrypt(accountBalanceEUR)
         await oldUser.save()
         res.json()
     }

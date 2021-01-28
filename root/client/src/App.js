@@ -77,7 +77,7 @@ export default function App() {
                         <ProtectedRoute exact path="/cards" component={() => <Cards />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <ProtectedRoute exact path="/settings" component={() => <Settings />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <ProtectedRouteAdmin exact path="/users" component={() => <Users />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRouteAdmin exact path="/create_admin" component={() => <NewAdmin />} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <ProtectedRouteAdmin exact path="/create_admin" component={() => <NewAdmin/>} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route path = "*" component={() => "404 NOT FOUND"}/>
                     </Switch>
                 </UserContext.Provider>
