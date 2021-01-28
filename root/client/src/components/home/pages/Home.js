@@ -14,14 +14,10 @@ export default function Home() {
                             <h3>A bank made just for</h3>
                             <h1>Students</h1>
                             <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia elementum
-                                suscipit.
-                                Vivamus faucibus arcu ut pulvinar imperdiet. Aliquam et ullamcorper augue. Quisque
-                                dictum in velit sed mattis.
-                                Proin tempor, urna eu euismod molestie, ante magna imperdiet massa, eget aliquet
-                                tellus mi at felis.
-                                Morbi mollis rhoncus massa et commodo. Nam magna mi, egestas ac arcu sit amet,
-                                dignissim facilisis felis.
+                                StuBank is a one-of-a-kind banking platform tailored specifically towards students to
+                                help them manage their finances throughout university. We offer a range of services to
+                                help students spend and manage their money in multiple currencies, all in one place.
+                                Get started today and see how StuBank can revolutionise your day-to-day banking.
                             </p>
                             <Link to="/register" className="btn" type="submit">Get started</Link>
                         </div>
@@ -33,36 +29,29 @@ export default function Home() {
                         <div className="title-heading">
                             <h3>Experience banking</h3>
                             <h1>like never before</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </div>
 
                         <div className="activities-grid">
                             <div className="activities-grid-item saving-account">
                                 <i className="icon ion-ios-lock"/>
-                                <h1>Saving Accounts</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
+                                <h1>Current Account</h1>
+                                <p>Manage your finances with our free current account which offers no monthly fee
+                                    and no spending limit. Send money to other accounts, exchange currencies and manage
+                                    your finances like never before</p>
                             </div>
                             <div className="activities-grid-item currency">
                                 <i className="icon ion-ios-planet"/>
                                 <h1>Currency Exchange</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
+                                <p>Exchange a range of currencies such as Pound (GBP), Euro (EUR) or Dollar (USD) for a
+                                    stress free international experience. With our multicurrency account you can have
+                                    full control over your spending when you travel in UK or abroad.</p>
                             </div>
                             <div className="activities-grid-item overdraft">
                                 <i className="icon ion-ios-card"/>
-                                <h1>Overdraft</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
+                                <h1>Virtual Card</h1>
+                                <p>With our secure virtual card you can pay for your online shopping with ease.
+                                    Generating a new card which is tied up to your account takes seconds which is very
+                                    useful if you want to secure your bank details when shopping online.</p>
                             </div>
                         </div>
                     </div>
@@ -89,26 +78,15 @@ export default function Home() {
                         <div className="title-heading">
                             <h2>Take charge of your finances and switch to</h2>
                             <h1>StuBank PLC</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </div>
                         <div className="banking-grid">
-                            <div className="banking-grid-item">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis,
-                                    et scelerisque erat tempor. Quisque mollis tincidunt commodo. Curabitur aliquam,
-                                    leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum.Lorem ipsum dolor sit amet, consectetur
-                                    adipiscing elit.</p>
-                            </div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                ligula iaculis,
-                                et scelerisque erat tempor.Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                Nunc euismod felis nec ligula iaculis,
-                                et scelerisque erat tempor. Quisque mollis tincidunt commodo. Curabitur aliquam, leo
-                                a aliquam accumsan, erat lorem imperdiet ex,
-                                in scelerisque enim ipsum non ipsum.</p>
+                            <p>Think StuBank is for you? Join today with our quick and simple application process to
+                                help you have full control over your finances today. Click the button below to get
+                                started.</p>
                         </div>
-                        <Link className="btn1" to="/register">Make an account now</Link>
+                        <Link style={{marginLeft: 350}}className="btn1" to="/register">Make an account now</Link>
+                        <div>
+                        </div>
                     </div>
                 </section>
             </main>
