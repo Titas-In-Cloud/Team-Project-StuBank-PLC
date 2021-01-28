@@ -58,8 +58,8 @@ export default function Cards () {
                     <h1>Virtual Cards</h1>
                     <div>
                         <div style={{paddingBottom: 20, paddingTop: 20, paddingLeft: 30}}>
-                            <btn className="button-account" style={{width: 110, fontSize: 12}}
-                                  disableElevation={true} onClick={() => {generateNumbers()}}>Generate New Card</btn>
+                            <button className="button-account" style={{width: 220, fontSize: 16, height: 40}}
+                                 onClick={() => {generateNumbers()}}>Generate New Card</button>
                         </div>
                         <form className="form-account" onSubmit = {submitCards}>
                             {errorCards && (<ErrorNotice message={errorCards} clearError={() => setErrorCards(undefined)}/>)}

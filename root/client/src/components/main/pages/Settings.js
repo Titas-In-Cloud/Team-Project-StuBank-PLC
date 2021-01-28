@@ -59,9 +59,6 @@ export default function Settings () {
             setPasswordNew(undefined)
             setPasswordCheck(undefined)
             setPhoneNum(user.phoneNum.data)
-            let accountBalanceGBP = undefined;
-            let accountBalanceEUR = undefined;
-            let accountBalanceUSD = undefined;
             sessionStorage.setItem("userData", JSON.stringify(user))
         } catch (err) {
             err.response.data.msg && setErrorAmend(err.response.data.msg)
@@ -109,9 +106,9 @@ export default function Settings () {
                         </div>
                     </div>
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 30, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={() => {
+                        <button className="button-account" style={{width: 180, fontSize: 16}} onClick={() => {
                             setShowAmend(!showAmend)
-                        }}>Amend Details</btn>
+                        }}>Amend Details</button>
                     </div>
                     {showAmend &&
                     <form className="form-account" onSubmit={submitAmend}>
@@ -191,10 +188,9 @@ export default function Settings () {
                         </div>
                     </form>}
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 20, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={() =>
+                        <button className="button-account" style={{width: 280, fontSize: 16}} onClick={() =>
                         { if (window.confirm('Are you sure you wish to delete the account?')) handleDeleteAccount() } }>
-                            Click here to delete account</btn>
-
+                            Click here to delete account</button>
                     </div>
                 </div>
             </div>
