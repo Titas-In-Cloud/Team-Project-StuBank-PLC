@@ -83,12 +83,12 @@ export default function Users () {
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell style={{width: 150}} className="font-headings">Personal ID</TableCell>
-                                                <TableCell style={{width: 150}} className="font-headings">First Name</TableCell>
-                                                <TableCell style={{width: 150}} className="font-headings">Last Name</TableCell>
-                                                <TableCell className="font-headings">Role</TableCell>
-                                                <TableCell className="font-headings">GBP Balance</TableCell>
-                                                <TableCell className="font-headings">USD Balance </TableCell>
-                                                <TableCell className="font-headings">EUR Balance</TableCell>
+                                                <TableCell style={{width: 200}} className="font-headings">First Name</TableCell>
+                                                <TableCell style={{width: 200}} className="font-headings">Last Name</TableCell>
+                                                <TableCell className="font-headings">GBP (£)</TableCell>
+                                                <TableCell className="font-headings">USD ($)</TableCell>
+                                                <TableCell className="font-headings">EUR (€)</TableCell>
+                                                <TableCell style={{width: 80}} className="font-headings">Role</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -99,10 +99,13 @@ export default function Users () {
                                                     </TableCell>
                                                     <TableCell className="font-information">{user.firstName.data}</TableCell>
                                                     <TableCell className="font-information">{user.lastName.data}</TableCell>
+                                                    <TableCell className="font-information" style={{textAlign: "center"}}>
+                                                        {user.accountBalanceGBP.data}</TableCell>
+                                                    <TableCell className="font-information" style={{textAlign: "center"}}>
+                                                        {user.accountBalanceUSD.data}</TableCell>
+                                                    <TableCell className="font-information" style={{textAlign: "center"}}>
+                                                        {user.accountBalanceEUR.data}</TableCell>
                                                     <TableCell className="font-information">{user.role}</TableCell>
-                                                    <TableCell className="font-information">{user.accountBalanceGBP.data}</TableCell>
-                                                    <TableCell className="font-information">{user.accountBalanceUSD.data}</TableCell>
-                                                    <TableCell className="font-information">{user.accountBalanceEUR.data}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
