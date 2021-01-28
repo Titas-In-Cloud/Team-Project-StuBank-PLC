@@ -68,7 +68,6 @@ export default function Account () {
             await Axios.post("http://localhost:5000/users/transfer", data)
             await updateData()
         } catch (err) {
-            console.log(err)
             err.response.data.msg && setErrorTransfer(err.response.data.msg)
         }
     }
@@ -80,7 +79,6 @@ export default function Account () {
             await Axios.post("http://localhost:5000/users/convert", data)
             await updateData()
         } catch (err) {
-            console.log(err)
             err.response.data.msg && setErrorConvert(err.response.data.msg)
         }
     }

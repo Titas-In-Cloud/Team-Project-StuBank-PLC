@@ -151,7 +151,6 @@ router.post("/login", async (req, res) => {
         if (!user)
             return res.status(400).json({msg: "This user does not exist"});
         const matchTrue = await bcrypt.compare(password, user.password);
-        console.log("bcrypt compare is working: " + matchTrue)
         if (!matchTrue)
             return res.status(400).json({msg: "Incorrect password"})
         const token = jwt.sign({id: user._id}, process.env.JWT_PWD)
