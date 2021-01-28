@@ -135,9 +135,12 @@ export default function Cards () {
                     </div>
                     <div>
                         <img src={CardTemplate} style={{width: 560}} alt=""/>
-                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 180, left: 60}}>{user.cardNumber.data}</p>
-                        <p style={{color: "#fafafa", fontSize: 20, position: "relative", bottom: 179, left: 75}}>{user.CVV.data}</p>
-                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 155, left: 65}}>{user.firstName.data} {user.lastName.data}</p>
+                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 180, left: 60}}>
+                            {user.cardNumber.data}</p>
+                        <p style={{color: "#fafafa", fontSize: 20, position: "relative", bottom: 179, left: 75}}>
+                            {user.CVV.data}</p>
+                        <p style={{color: "white", fontSize: 40, position: "absolute", bottom: 78, left: 65}}>
+                            {user.firstName.data} {user.lastName.data}</p>
                     </div>
                 </div>
             </div>
