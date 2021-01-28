@@ -22,7 +22,7 @@ export default function Register () {
     const { setUserData } = useContext(UserContext);
     const role = "user";
     const history = useHistory();
-
+    sessionStorage.clear()
     const submit = async (e) => {
         e.preventDefault();
         try {

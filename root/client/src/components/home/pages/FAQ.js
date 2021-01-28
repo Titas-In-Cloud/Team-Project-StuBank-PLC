@@ -2,6 +2,7 @@ import React from "react";
 import { HomeNavigationBar } from "../../";
 
 export default function FAQ () {
+    sessionStorage.clear()
     return (
         <div>
             <HomeNavigationBar />
