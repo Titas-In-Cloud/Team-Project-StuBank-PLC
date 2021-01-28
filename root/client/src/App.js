@@ -5,29 +5,8 @@ import { Overview, Transactions, Account, Cards, Settings } from "./components";
 import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
 import Axios from "axios";
-import ProtectedRoute from "./ProtectedRoute";
-import ProtectedRouteAdmin from "./ProtectedRouteAdmin";
 
 export default function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-        const checkAuth = async () => {
-            const token = sessionStorage.getItem('auth-token');
-            const request = Axios.create({
-                headers: {
-                    "x-auth-token": token
-                }
-            });
-            await request.post('http://localhost:5000/users/tokenIsValid')
-                .then( res => {
-                if (res.data) {
-                setIsAuthenticated(true);
-            }
-                else{
-                    setIsAuthenticated(false);
-            }
-        })
-        }
     const [userData, setUserData] = useState({
         token: undefined,
         user: undefined,
