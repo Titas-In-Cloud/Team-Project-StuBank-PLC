@@ -67,7 +67,7 @@ export default function App() {
                         <Route exact path="/FAQ" component={() => <FAQ />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route exact path="/login" component={() => <Login />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route exact path="/register" component={() => <Register />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRoute path='/overview' component={() => <Overview />} onEnter={checkAuth()} auth={isAuthenticated} />
+                        <ProtectedRoute exact path='/overview' component={() => <Overview />} onEnter={checkAuth()} auth={isAuthenticated} />
                         <ProtectedRoute exact path="/transactions" component={() => <Transactions />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <ProtectedRoute exact path="/account" component={() => <Account />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <ProtectedRoute exact path="/cards" component={() => <Cards />} onEnter={checkAuth()} auth={isAuthenticated}/>
