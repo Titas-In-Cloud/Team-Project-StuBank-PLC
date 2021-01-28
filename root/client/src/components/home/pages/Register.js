@@ -36,7 +36,7 @@ export default function Register () {
                 token: registerUser.data.token,
                 user: registerUser.data.user,
             });
-            localStorage.setItem("auth-token", registerUser.data.token);
+            sessionStorage.setItem("auth-token", registerUser.data.token);
             sessionStorage.setItem("userData", JSON.stringify(registerUser.data.user));
             history.push("/overview");
         } catch (err) {
