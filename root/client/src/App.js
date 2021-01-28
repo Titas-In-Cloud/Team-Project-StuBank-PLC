@@ -5,8 +5,6 @@ import { Overview, Transactions, Account, Cards, Settings } from "./components";
 import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
 import Axios from "axios";
-import ProtectedRoute from "./ProtectedRoute";
-import ProtectedRouteAdmin from "./ProtectedRouteAdmin";
 
 export default function App() {
     const [userData, setUserData] = useState({
