@@ -26,18 +26,18 @@ export default function Register () {
     const submit = async (e) => {
         e.preventDefault();
         try {
-            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum, role };
-            await Axios.post("http://localhost:5000/users/register", newUser);
-            const loginRes = await Axios.post("http://localhost:5000/users/login", {
-                personalID,
-                password,
-            });
+            const newUser = { email, firstName, lastName, password, passwordCheck, personalID, phoneNum, role};
+            const registerUser = await Axios.post("http://localhost:5000/users/register", newUser);
+            // const loginRes = await Axios.post("http://localhost:5000/users/login", {
+            //     personalID,
+            //     password,
+            // });
             setUserData({
-                token: loginRes.data.token,
-                user: loginRes.data.user,
+                token: registerUser.data.token,
+                user: registerUser.data.user,
             });
-            localStorage.setItem("auth-token", loginRes.data.token);
-            sessionStorage.setItem("userData", JSON.stringify(loginRes.data.user));
+            localStorage.setItem("auth-token", registerUser.data.token);
+            sessionStorage.setItem("userData", JSON.stringify(registerUser.data.user));
             history.push("/overview");
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg);

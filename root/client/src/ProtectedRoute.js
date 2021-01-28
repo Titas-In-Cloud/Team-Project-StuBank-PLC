@@ -5,9 +5,9 @@ const ProtectedRoute = ({ component: Component, auth, ...rest }) => {
     let user = JSON.parse(sessionStorage.getItem("userData"));
     return(
         <Route {...rest} render={(props) => (
-            (auth === true) && (user.role === "user")
+            ((auth === true) && (user.role === "user"))
                 ? <Component {...props} />
-                : <Redirect to='/login' />
+                : <Redirect to='/home' />
         )} />
     )
 }
