@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { AdminNavigationBar } from "../../";
 import Axios from "axios";
 import ErrorNotice from "../../misc/ErrorNotice";
+import {useHistory} from "react-router-dom";
 
 export default function NewAdmin () {
     const [email, setEmail] = useState(undefined);
@@ -13,6 +14,43 @@ export default function NewAdmin () {
     const [phoneNum, setPhoneNum] = useState(undefined);
     const role = "admin";
     const [error, setError] = useState();
+    const history = useHistory();
+
+    async function checkLoggedIn() {
+        try {
+            const token = JSON.parse(sessionStorage.getItem("auth-token"))
+            if (token == null){
+                return false
+            }
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            const logged = await request.post("http://localhost:5000/users/tokenIsValid")
+            if (logged.data === false){
+                return false
+            }
+            return true
+        } catch (err) {
+        }
+    }
+
+    const logged = checkLoggedIn()
+    if (logged === false){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
+
+    useEffect(() => {
+        const logged = checkLoggedIn()
+        if (logged === false){
+            sessionStorage.clear()
+            history.push('/home')
+            history.go(0)
+        }
+    }, []);
 
     const submit = async (e) => {
         e.preventDefault();

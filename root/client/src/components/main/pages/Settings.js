@@ -9,6 +9,11 @@ export default function Settings () {
     const history = useHistory();
     const {setUserData} = useContext(UserContext);
     let user = JSON.parse(sessionStorage.getItem("userData"))
+    if (user == null || user.role !== "user") {
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
     const [showAmend, setShowAmend] = useState(false)
     const [errorAmend, setErrorAmend] = useState();
     const [email, setEmail] = useState(user.email.data);
@@ -65,7 +70,40 @@ export default function Settings () {
         }
     }
 
+    async function checkLoggedIn() {
+        try {
+            const token = JSON.parse(sessionStorage.getItem("auth-token"))
+            if (token == null){
+                return false
+            }
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            const logged = await request.post("http://localhost:5000/users/tokenIsValid")
+            if (logged.data === false){
+                return false
+            }
+            return true
+        } catch (err) {
+        }
+    }
+
+    const logged = checkLoggedIn()
+    if (logged === false){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
+
     useEffect(() => {
+        const logged = checkLoggedIn()
+        if (logged === false){
+            sessionStorage.clear()
+            history.push('/home')
+            history.go(0)
+        }
         updateData();
     }, []);
 

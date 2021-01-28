@@ -3,6 +3,7 @@ import { AdminNavigationBar } from "../../";
 import Axios from "axios";
 import ErrorNotice from "../../misc/ErrorNotice";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {useHistory} from "react-router-dom";
 
 export default function Users () {
     let userDataToAmend = "";
@@ -10,6 +11,12 @@ export default function Users () {
     //Sets user data to the logged in admin user if it is null to prevent null pointer errors
     if (!userDataToAmend) {
         userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
+    }
+    const history = useHistory();
+    if (userDataToAmend == null || userDataToAmend.role !== "admin") {
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
     }
     const [allUsers, setAllUsers] = useState([])
     const [personalID, setPersonalID] = useState(undefined);
@@ -53,8 +60,40 @@ export default function Users () {
             err.response.data.msg && setError(err.response.data.msg)
         }
     }
+    async function checkLoggedIn() {
+        try {
+            const token = JSON.parse(sessionStorage.getItem("auth-token"))
+            if (token == null){
+                return false
+            }
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            const logged = await request.post("http://localhost:5000/users/tokenIsValid")
+            if (logged.data === false){
+                return false
+            }
+            return true
+        } catch (err) {
+        }
+    }
+
+    const logged = checkLoggedIn()
+    if (logged === false){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
 
     useEffect(() => {
+        const logged = checkLoggedIn()
+        if (logged === false){
+            sessionStorage.clear()
+            history.push('/home')
+            history.go(0)
+        }
         updateData();
     }, []);
 
