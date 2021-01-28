@@ -34,7 +34,7 @@ export default function Login () {
                 history.push("/users")
             }
             else {
-                let totpToken = prompt("Please enter the google authenticator code: ");
+                    let totpToken = prompt("Please enter the google authenticator code: ");
                 //Get the totpSecret from the server-side
                 let totpSecret = loginRes.data.user.totpSecret.base32;
                 const totpData = {
