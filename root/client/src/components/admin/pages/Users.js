@@ -11,7 +11,7 @@ export default function Users () {
     if (!userDataToAmend) {
         userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
     }
-
+    const [allUsers, setAllUsers] = useState([])
     const [personalID, setPersonalID] = useState(undefined);
     const [showAmend, setShowAmend] = useState(false);
     const [error, setError] = useState();
@@ -25,6 +25,8 @@ export default function Users () {
 
     async function updateData() {
         try {
+            const newUsers = await Axios.post("http://localhost:5000/users/getAll")
+            setAllUsers(newUsers.data)
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
             userDataToAmend = newData.data
             setShowAmend(false)
@@ -67,7 +69,6 @@ export default function Users () {
             err.response.data.msg && setError(err.response.data.msg)
         }
     }
-
     return (
         <div className="top-bar">
             <AdminNavigationBar />
@@ -91,7 +92,19 @@ export default function Users () {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-
+                                            {allUsers.map((user) => (
+                                                <TableRow key={user.personalID}>
+                                                    <TableCell component="th" scope="row" className="font-information">
+                                                        {user.personalID}
+                                                    </TableCell>
+                                                    <TableCell className="font-information">{user.firstName.data}</TableCell>
+                                                    <TableCell className="font-information">{user.lastName.data}</TableCell>
+                                                    <TableCell className="font-information">{user.role}</TableCell>
+                                                    <TableCell className="font-information">{user.accountBalanceGBP.data}</TableCell>
+                                                    <TableCell className="font-information">{user.accountBalanceUSD.data}</TableCell>
+                                                    <TableCell className="font-information">{user.accountBalanceEUR.data}</TableCell>
+                                                </TableRow>
+                                            ))}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

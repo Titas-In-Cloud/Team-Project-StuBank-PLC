@@ -196,20 +196,14 @@ router.post("/tokenIsValid", async (req, res) =>{
 function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, currency){
     let date = new Date()
     date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
-    console.log('1')
     payerBalance = parseFloat(Number(aesDecrypt(payerBalance)) - Number(amount)).toFixed(2)
-    console.log('1.5')
     if (Number(payerBalance) < 0) {return false}
     else {payerBalance = aesEncrypt(payerBalance)}
-    console.log('2')
     payeeBalance = aesEncrypt((parseFloat(aesDecrypt(payeeBalance)) + parseFloat(amount)).toFixed(2))
-    console.log('3')
     const transactionIn = {date, amountIn: aesEncrypt(amount), amountOut: aesEncrypt(''), account: payerID,
         balance: payeeBalance, currency}
-    console.log('4')
     const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(amount), account: payeeID.value,
         balance: payerBalance, currency}
-    console.log('5')
     return {payeeBalance, payerBalance, transactionIn, transactionOut}
 }
 
@@ -471,4 +465,20 @@ router.post("/convert", async (req, res) =>{
     }
 })
 
+router.post("/getAll", async (req, res) => {
+    try{
+        let data = await User.find({}, {personalID: 1, firstName: 1, lastName: 1, role: 1, accountBalanceGBP: 1, accountBalanceUSD: 1, accountBalanceEUR: 1});
+        for(let user of data){
+            user.firstName = {data: aesDecrypt(user.firstName)}
+            user.lastName = {data: aesDecrypt(user.lastName)}
+            user.accountBalanceGBP = {data: aesDecrypt(user.accountBalanceGBP)}
+            user.accountBalanceUSD = {data: aesDecrypt(user.accountBalanceUSD)}
+            user.accountBalanceEUR = {data: aesDecrypt(user.accountBalanceEUR)}
+        }
+        res.json(data)
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+})
 module.exports = router;
