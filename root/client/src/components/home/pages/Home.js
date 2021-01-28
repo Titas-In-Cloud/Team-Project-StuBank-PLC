@@ -84,7 +84,7 @@ export default function Home() {
                                 help you have full control over your finances today. Click the button below to get
                                 started.</p>
                         </div>
-                        <Link style={{marginLeft: 350}}className="btn1" to="/register">Make an account now</Link>
+                        <Link style={{marginLeft: 350}} className="btn1" to="/register">Make an account now</Link>
                         <div>
                         </div>
                     </div>
