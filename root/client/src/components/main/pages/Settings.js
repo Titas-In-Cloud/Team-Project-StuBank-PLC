@@ -188,7 +188,8 @@ export default function Settings () {
                         </div>
                     </form>}
                     <div className="inputBox" style={{paddingLeft: 20, paddingTop: 20, paddingBottom: 20}}>
-                        <btn className="button-account" disableElevation={true} onClick={() => { if (window.confirm('Are you sure you wish to delete the account?')) handleDeleteAccount() } }>
+                        <btn className="button-account" disableElevation={true} onClick={() =>
+                        { if (window.confirm('Are you sure you wish to delete the account?')) handleDeleteAccount() } }>
                             Click here to delete account</btn>
 
                     </div>

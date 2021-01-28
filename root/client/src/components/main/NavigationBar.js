@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link, withRouter, useHistory } from "react-router-dom";
 
 import LogoutLogo from "../images/logout-logo.png";
 import SettingsLogo from "../images/settings-logo.png";
@@ -13,6 +13,7 @@ import UserContext from "../../context/UserContext";
 function NavigationBar(){
     let user = JSON.parse(sessionStorage.getItem("userData"));
 
+    const history = useHistory();
     const {setUserData} = useContext(UserContext);
 
     // This removes the authentication token from the user data and also the local storage when the user logs out
@@ -23,6 +24,7 @@ function NavigationBar(){
         })
         sessionStorage.clear()
         localStorage.clear()
+        history.push('/login')
     }
 
 
@@ -66,10 +68,10 @@ function NavigationBar(){
                 </div>
             </div>
             <div className="button">
-                <Link to="/login" onClick={() => logout()}>
+                <btn style={{cursor: "pointer"}} onClick={() =>{ if (window.confirm('Do you want to logout?')) logout() }}>
                     <img className="image-logout" src={LogoutLogo} alt="Logout"/>
                     <p style={{color: "#ff1b1b" }}>Logout</p>
-                </Link>
+                </btn>
                 <Link to="/settings">
                     <img className="image-settings" src={SettingsLogo} alt="Settings"/>
                     <p style={{color: "#8F8D8D" }}>Settings</p>
