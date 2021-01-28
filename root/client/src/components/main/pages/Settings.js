@@ -59,6 +59,9 @@ export default function Settings () {
             setPasswordNew(undefined)
             setPasswordCheck(undefined)
             setPhoneNum(user.phoneNum.data)
+            let accountBalanceGBP = undefined;
+            let accountBalanceEUR = undefined;
+            let accountBalanceUSD = undefined;
             sessionStorage.setItem("userData", JSON.stringify(user))
         } catch (err) {
             err.response.data.msg && setErrorAmend(err.response.data.msg)
