@@ -63,17 +63,17 @@ export default function App() {
                 <UserContext.Provider value={{userData, setUserData}}>
                     <Switch>
                         <Route exact path="/" component={() => <Home />}/>
-                        <Route exact path="/home" component={() => <Home />} onEnter={checkAuth()} auth={isAuthenticated} />
-                        <Route exact path="/FAQ" component={() => <FAQ />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <Route exact path="/login" component={() => <Login />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <Route exact path="/register" component={() => <Register />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRoute path='/overview' component={() => <Overview />} onEnter={checkAuth()} auth={isAuthenticated} />
-                        <ProtectedRoute exact path="/transactions" component={() => <Transactions />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRoute exact path="/account" component={() => <Account />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRoute exact path="/cards" component={() => <Cards />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRoute exact path="/settings" component={() => <Settings />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRouteAdmin exact path="/users" component={() => <Users />} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <ProtectedRouteAdmin exact path="/create_admin" component={() => <NewAdmin/>} onEnter={checkAuth()} auth={isAuthenticated}/>
+                        <Route exact path="/home" component={() => <Home />}/>
+                        <Route exact path="/FAQ" component={() => <FAQ />}/>
+                        <Route exact path="/login" component={() => <Login />}/>
+                        <Route exact path="/register" component={() => <Register />}/>
+                        <Route exact path='/overview' component={() => <Overview />}/>
+                        <Route exact path="/transactions" component={() => <Transactions />}/>
+                        <Route exact path="/account" component={() => <Account />}/>
+                        <Route exact path="/cards" component={() => <Cards />}/>
+                        <Route exact path="/settings" component={() => <Settings />}/>
+                        <Route exact path="/users" component={() => <Users />}/>
+                        <Route exact path="/create_admin" component={() => <NewAdmin/>}/>
                         <Route path = "*" component={() => "404 NOT FOUND"}/>
                     </Switch>
                 </UserContext.Provider>

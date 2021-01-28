@@ -9,10 +9,13 @@ import UserContext from "../../context/UserContext";
 
 function NavigationBar(){
     let userDetails = JSON.parse(sessionStorage.getItem("userData"));
-
     const history = useHistory();
     const {setUserData} = useContext(UserContext);
-
+    if (userDetails === null || userDetails.role !== "admin"){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
     // This removes the authentication token from the user data and also the local storage when the user logs out
     const logout = () => {
         setUserData({
@@ -23,7 +26,11 @@ function NavigationBar(){
         localStorage.clear()
         history.push('/login')
     }
-
+    if (userDetails.role !== 'admin'){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
     return (
         <div className="top-bar">
             <div className="sidebar">

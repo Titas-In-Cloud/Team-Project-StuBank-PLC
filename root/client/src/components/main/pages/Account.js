@@ -4,9 +4,16 @@ import ErrorNotice from "../../misc/ErrorNotice"
 import Axios from "axios";
 import CreatableSelect from 'react-select/creatable';
 import { MainNavigationBar } from "../../";
+import {useHistory} from "react-router-dom";
 
 export default function Account () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
+    const history = useHistory();
+    if (user == null || user.role !== "user") {
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
     const [amountTransfer, setAmountTransfer] = useState();
     const [amountConvert, setAmountConvert] = useState();
     const [errorTransfer, setErrorTransfer] = useState();
@@ -44,7 +51,44 @@ export default function Account () {
         }
     }
 
+    async function checkLoggedIn() {
+        try {
+            if (user.role !== 'user'){
+                return false
+            }
+            const token = JSON.parse(sessionStorage.getItem("auth-token"))
+            if (token == null){
+                return false
+            }
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            const logged = await request.post("http://localhost:5000/users/tokenIsValid")
+            if (logged.data === false){
+                return false
+            }
+            return true
+        } catch (err) {
+            //err.response.data.msg
+        }
+    }
+
+    const logged = checkLoggedIn()
+    if (logged === false){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
+
     useEffect(() => {
+        const logged = checkLoggedIn()
+        if (logged === false){
+            sessionStorage.clear()
+            history.push('/home')
+            history.go(0)
+        }
         updateData();
     }, []);
 

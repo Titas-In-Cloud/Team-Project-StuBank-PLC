@@ -1,14 +1,58 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { MainNavigationBar } from "../../";
 import qrcode from "qrcode";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {useHistory} from "react-router-dom";
+import Axios from "axios";
 
 export default function Overview() {
     let user = JSON.parse(sessionStorage.getItem("userData"));
-        const [balanceGBP] = useState(user.accountBalanceGBP.data);
-        const [balanceUSD] = useState(user.accountBalanceUSD.data);
-        const [balanceEUR] = useState(user.accountBalanceEUR.data);
-        const [qrCodeImg, setQrCodeImg] = useState();
+    const history = useHistory();
+    if (user == null || user.role !== "user") {
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
+    async function checkLoggedIn() {
+        try {
+            const token = JSON.parse(sessionStorage.getItem("auth-token"))
+            if (token == null){
+                return false
+            }
+            const request = Axios.create({
+                headers: {
+                    "x-auth-token": token
+                }
+            });
+            const logged = await request.post("http://localhost:5000/users/tokenIsValid")
+            if (logged.data === false){
+                return false
+            }
+            return true
+        } catch (err) {
+        }
+    }
+
+    const logged = checkLoggedIn()
+    if (logged === false){
+        sessionStorage.clear()
+        history.push('/home')
+        history.go(0)
+    }
+
+    useEffect(() => {
+        const logged = checkLoggedIn()
+        if (logged === false){
+            sessionStorage.clear()
+            history.push('/home')
+            history.go(0)
+        }
+    }, []);
+
+    const [balanceGBP] = useState(user.accountBalanceGBP.data);
+    const [balanceUSD] = useState(user.accountBalanceUSD.data);
+    const [balanceEUR] = useState(user.accountBalanceEUR.data);
+    const [qrCodeImg, setQrCodeImg] = useState();
 
         //Converts totpSecret into a string to display the qr code so it can be scanned with google auth (if user logged in)
         if(
