@@ -1,8 +1,6 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import { AdminNavigationBar } from "../../";
 import Axios from "axios";
-import UserContext from "../../../context/UserContext";
-import {Button} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 
@@ -14,7 +12,6 @@ export default function Users () {
         userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
     }
 
-    const {userData, setUserData} = useContext(UserContext);
     const [personalID, setPersonalID] = useState(undefined);
     const [showAmend, setShowAmend] = useState(false);
     const [error, setError] = useState();
@@ -25,14 +22,6 @@ export default function Users () {
     const [accountBalanceGBP, setBalanceGBP] = useState(userDataToAmend.accountBalanceGBP.data);
     const [accountBalanceUSD, setBalanceUSD] = useState(userDataToAmend.accountBalanceUSD.data);
     const [accountBalanceEUR, setBalanceEUR] = useState(userDataToAmend.accountBalanceEUR.data);
-
-    async function getAllData() {
-        try{
-            let allUsers = await Users.find({}).exec();
-        } catch (err) {
-            err.response.data.msg && setError(err.response.data.msg)
-        }
-    }
 
     async function updateData() {
         try {

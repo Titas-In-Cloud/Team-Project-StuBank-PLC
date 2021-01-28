@@ -1,9 +1,7 @@
 import React, {useState} from "react";
 import { AdminNavigationBar } from "../../";
-import UserContext from "../../../context/UserContext";
 import Axios from "axios";
 import ErrorNotice from "../../misc/ErrorNotice";
-import {useHistory} from "react-router-dom";
 
 export default function NewAdmin () {
     const [email, setEmail] = useState(undefined);

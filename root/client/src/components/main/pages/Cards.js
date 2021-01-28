@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {MainNavigationBar} from "../../";
-import {Button} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice";
 import Axios from "axios";
 import CardTemplate from "../../images/bank-card-template.png";
@@ -81,16 +80,6 @@ export default function Cards () {
                                     name="CVV"
                                     value = {CVV}
                                     readOnly={true}
-                                />
-                            </div>
-
-                            <label>Freeze Card: </label>
-                            <div style={{paddingBottom: 10, paddingTop: 3}}>
-                                <input
-                                    type="checkbox"
-                                    name="Freeze Your Card"
-                                    defaultChecked = {frozen}
-                                    onChange = {(e) => setFrozen(!frozen)}
                                 />
                             </div>
 
