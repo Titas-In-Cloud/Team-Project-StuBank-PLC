@@ -14,14 +14,10 @@ export default function Home() {
                             <h3>A bank made just for</h3>
                             <h1>Students</h1>
                             <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia elementum
-                                suscipit.
-                                Vivamus faucibus arcu ut pulvinar imperdiet. Aliquam et ullamcorper augue. Quisque
-                                dictum in velit sed mattis.
-                                Proin tempor, urna eu euismod molestie, ante magna imperdiet massa, eget aliquet
-                                tellus mi at felis.
-                                Morbi mollis rhoncus massa et commodo. Nam magna mi, egestas ac arcu sit amet,
-                                dignissim facilisis felis.
+                                StuBank is a one-of-a-kind banking platform tailored specifically towards students to
+                                help them manage their finances throughout university. We offer a range of services to
+                                help students spend and manage their money in multiple currencies, all in one place.
+                                Get started today and see how StuBank can revolutionise your day-to-day banking.
                             </p>
                             <Link to="/register" className="btn" type="submit">Get started</Link>
                         </div>
@@ -33,36 +29,22 @@ export default function Home() {
                         <div className="title-heading">
                             <h3>Experience banking</h3>
                             <h1>like never before</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </div>
 
                         <div className="activities-grid">
-                            <div className="activities-grid-item saving-account">
-                                <i className="icon ion-ios-lock"/>
-                                <h1>Saving Accounts</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
-                            </div>
                             <div className="activities-grid-item currency">
                                 <i className="icon ion-ios-planet"/>
                                 <h1>Currency Exchange</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
+                                <p>Manage your finaces in a range of currencies (GBP, EUR, USD) for a stress free
+                                international experience. Have full control over your spending, even outside the UK</p>
                             </div>
                             <div className="activities-grid-item overdraft">
                                 <i className="icon ion-ios-card"/>
                                 <h1>Overdraft</h1>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis, et scelerisque erat tempor. Quisque mollis tincidunt commodo.
-                                    Curabitur aliquam, leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum. Mauris non diam ac risus lacinia
-                                    sollicitudin.</p>
+                                <p>Maintenence loan not paid into your account yet? Got rent and/or bills to pay? Worry
+                                not as StuBank offers an interest free overdraft to all its customers.
+                                Checking if you're eligible for an overdraft won't affect your credit score and
+                                there are no charges to full repaying an overdraft before graduation.</p>
                             </div>
                         </div>
                     </div>
@@ -89,24 +71,20 @@ export default function Home() {
                         <div className="title-heading">
                             <h2>Take charge of your finances and switch to</h2>
                             <h1>StuBank PLC</h1>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </div>
                         <div className="banking-grid">
-                            <div className="banking-grid-item">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                    ligula iaculis,
-                                    et scelerisque erat tempor. Quisque mollis tincidunt commodo. Curabitur aliquam,
-                                    leo a aliquam accumsan, erat lorem imperdiet ex,
-                                    in scelerisque enim ipsum non ipsum.Lorem ipsum dolor sit amet, consectetur
-                                    adipiscing elit.</p>
+                            <div className="banking-grid">
+                                <p>Think StuBank is for you? Join today with our quick and simple application process to
+                                    help you have full control over your finances today. Click the button below to get
+                                    started.</p>
                             </div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc euismod felis nec
-                                ligula iaculis,
-                                et scelerisque erat tempor.Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                Nunc euismod felis nec ligula iaculis,
-                                et scelerisque erat tempor. Quisque mollis tincidunt commodo. Curabitur aliquam, leo
-                                a aliquam accumsan, erat lorem imperdiet ex,
-                                in scelerisque enim ipsum non ipsum.</p>
+                            <p>StuBank plc. Registered in England No. XXXXXXXX.
+                                Registered Office: Urban Sciences Building
+                                Newcastle University, NE4 5TG, United Kingdom.
+                                Authorised by the Prudential Regulation Authority and regulated by the Financial
+                                Conduct Authority and the Prudential Regulation Authority under registration number
+                                XXXXXX.
+                            </p>
                         </div>
                         <Link className="btn1" to="/register">Make an account now</Link>
                     </div>

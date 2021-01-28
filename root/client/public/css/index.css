@@ -411,7 +411,7 @@ nav.home-nav{
     margin: 1rem 0;
 }
 .home-message p{
-    text-transform: lowercase;
+    text-transform: none;
 }
 .btn{
     background-color: #eb648c;
