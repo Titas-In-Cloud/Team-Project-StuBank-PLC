@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
-import { BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom';
-import { Home, Features, AboutUs, FAQ, Login, Register } from "./components";
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import { Home, FAQ, Login, Register } from "./components";
 import { Overview, Transactions, Account, Cards, Settings } from "./components";
 import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
@@ -66,8 +66,6 @@ export default function App() {
                     <Switch>
                         <Route exact path="/" component={() => <Home />}/>
                         <Route exact path="/home" component={() => <Home />} onEnter={checkAuth()} auth={isAuthenticated} />
-                        <Route exact path="/features" component={() => <Features/>} onEnter={checkAuth()} auth={isAuthenticated}/>
-                        <Route exact path="/about_us" component={() => <AboutUs />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route exact path="/FAQ" component={() => <FAQ />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route exact path="/login" component={() => <Login />} onEnter={checkAuth()} auth={isAuthenticated}/>
                         <Route exact path="/register" component={() => <Register />} onEnter={checkAuth()} auth={isAuthenticated}/>
