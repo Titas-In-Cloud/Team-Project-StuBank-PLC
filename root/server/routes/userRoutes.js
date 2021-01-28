@@ -365,13 +365,13 @@ router.post("/amendDetails", async (req, res) =>{
         oldUser.lastName = aesEncrypt(lastName)
         oldUser.phoneNum = aesEncrypt(phoneNum)
         if (accountBalanceGBP) {
-            oldUser.accountBalanceGBP = aesEncrypt(accountBalanceGBP)
+            oldUser.accountBalanceGBP = aesEncrypt(parseFloat(accountBalanceGBP).toFixed(2))
         }
         if (accountBalanceUSD) {
-            oldUser.accountBalanceUSD = aesEncrypt(accountBalanceUSD)
+            oldUser.accountBalanceUSD = aesEncrypt(parseFloat(accountBalanceUSD).toFixed(2))
         }
         if (accountBalanceEUR) {
-            oldUser.accountBalanceEUR = aesEncrypt(accountBalanceEUR)
+            oldUser.accountBalanceEUR = aesEncrypt(parseFloat(accountBalanceEUR).toFixed(2))
         }
         await oldUser.save()
         res.json()
