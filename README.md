@@ -39,6 +39,18 @@ After installation, open **Authenticator** app and click the plus symbol on the 
 it's done it is all set up and there should be 6 number code which changes each 30 seconds. This will be used the next 
 time you will try to login to your account.
 
+#### Certificate Installation Process
+
+Run the program normally and when it loads there should be a warning about the website being insecure. Click the
+security symbol (normally to the left of the URL) in your browser, and click certificate. On the popup, navigate to the
+details tab and click copy to file. Click next and choose DER encoded binary X.509 (.CER) as the option (should be
+default option). Click next and on the next page click browse, and then type in any name for your certificate and choose
+the download location. Then click save to close the dialog box, and then next and finish. Then open the folder where the
+certificate was downloaded, then open it and choose install certificate. Choose current user or local machine depending
+on your preferred installation, and click next. Then choose place all certificates in the following store, and choose
+trusted root certification authorities. Then click next and finish and restart close your browser and restart the
+application. The connection will now be secure.
+
 #### User Account Functionality
 User bank account has four pages which you can see on the navigation bar on the left - **Overview**, **Transactions**, 
 **Account** and **Cards**. 
