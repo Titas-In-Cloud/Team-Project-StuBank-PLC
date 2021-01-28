@@ -7,13 +7,13 @@ import {useHistory} from "react-router-dom";
 
 export default function Users () {
     let userDataToAmend = "";
-
+    const userData = JSON.parse(sessionStorage.getItem("userData"))
     //Sets user data to the logged in admin user if it is null to prevent null pointer errors
     if (!userDataToAmend) {
         userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
     }
     const history = useHistory();
-    if (userDataToAmend == null || userDataToAmend.role !== "admin") {
+    if (userData == null || userData.role !== "admin") {
         sessionStorage.clear()
         history.push('/home')
         history.go(0)
@@ -44,7 +44,6 @@ export default function Users () {
             setBalanceGBP(userDataToAmend.accountBalanceGBP.data)
             setBalanceUSD(userDataToAmend.accountBalanceUSD.data)
             setBalanceEUR(userDataToAmend.accountBalanceEUR.data)
-            sessionStorage.setItem("userData", JSON.stringify(userDataToAmend))
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }
@@ -52,9 +51,8 @@ export default function Users () {
 
     async function getUserData() {
         try {
-            const userData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
-            userDataToAmend = userData.data
-            sessionStorage.setItem("userData", JSON.stringify(userDataToAmend))
+            const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
+            userDataToAmend = newData.data
             setShowAmend(!showAmend)
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
