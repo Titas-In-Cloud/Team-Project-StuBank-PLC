@@ -3,6 +3,7 @@ import {MainNavigationBar} from "../../";
 import {Button} from "@material-ui/core";
 import ErrorNotice from "../../misc/ErrorNotice";
 import Axios from "axios";
+import CardTemplate from "../../images/bank-card-template.png";
 
 export default function Cards () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
@@ -54,41 +55,57 @@ export default function Cards () {
         <div className="top-bar">
             <MainNavigationBar />
             <div className="main-background">
-                <div className="small-bank-box-left">
-                    <h1>Cards</h1>
+                <div className="small-bank-box">
+                    <h1>Virtual Cards</h1>
                     <div>
-                        <Button variant={"contained"} disableElevation={true} onClick={() => {
-                            generateNumbers()
-                        }}>Generate Card</Button>
+                        <div style={{paddingBottom: 20, paddingTop: 20, paddingLeft: 30}}>
+                            <btn className="button-account" style={{width: 110, fontSize: 12}}
+                                  disableElevation={true} onClick={() => {generateNumbers()}}>Generate New Card</btn>
+                        </div>
+                        <form className="form-account" onSubmit = {submitCards}>
+                            {errorCards && (<ErrorNotice message={errorCards} clearError={() => setErrorCards(undefined)}/>)}
+                            <label>Card Number: </label>
+                            <div style={{paddingBottom: 10, paddingTop: 3}}>
+                                <input
+                                    type="text"
+                                    name="Card Number"
+                                    readOnly={true}
+                                    value ={cardNumber}
+                                />
+                            </div>
+
+                            <label>CVV: </label>
+                            <div style={{paddingBottom: 10, paddingTop: 3}}>
+                                <input
+                                    type="text"
+                                    name="CVV"
+                                    value = {CVV}
+                                    readOnly={true}
+                                />
+                            </div>
+
+                            <label>Freeze Card: </label>
+                            <div style={{paddingBottom: 10, paddingTop: 3}}>
+                                <input
+                                    type="checkbox"
+                                    name="Freeze Your Card"
+                                    defaultChecked = {frozen}
+                                    onChange = {(e) => setFrozen(!frozen)}
+                                />
+                            </div>
+
+                            <div style={{paddingTop: 5, paddingLeft: 10}}>
+                                <input className="button-account" style={{width: 110, fontSize: 12}}
+                                       type="submit" value="Save"/>
+                            </div>
+                        </form>
                     </div>
-                    <form className="Form1" onSubmit = {submitCards}>
-                        {errorCards && (<ErrorNotice message={errorCards} clearError={() => setErrorCards(undefined)}/>)}
-                        <label>Card Number: </label>
-                        <input
-                            type="text"
-                            name="Card Number"
-                            readOnly={true}
-                            value ={cardNumber}
-                        />
-                        <label>CVV: </label>
-                        <input
-                            type="text"
-                            name="CVV"
-                            value = {CVV}
-                            readOnly={true}
-                        />
-                        <label>Freeze Card: </label>
-                        <input
-                            type="checkbox"
-                            name="Freeze"
-                            defaultChecked = {frozen}
-                            onChange = {(e) => setFrozen(!frozen)}
-                        />
-                        <input type="submit" value="Save"/>
-                    </form>
-                </div>
-                <div className="small-bank-box-right">
-                    <h1>Your Cards</h1>
+                    <div>
+                        <img src={CardTemplate} style={{width: 560}} alt=""/>
+                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 180, left: 60}}>{user.cardNumber.data}</p>
+                        <p style={{color: "#fafafa", fontSize: 20, position: "relative", bottom: 179, left: 75}}>{user.CVV.data}</p>
+                        <p style={{color: "white", fontSize: 40, position: "relative", bottom: 155, left: 65}}>{user.firstName.data} {user.lastName.data}</p>
+                    </div>
                 </div>
             </div>
         </div>
