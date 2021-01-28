@@ -1,8 +1,8 @@
-###Description
+### Description
 **StuBank PLC** is a simple and reliable banking platform focused on students with minimalistic design and basic 
 functionality. It was created during **CSC2033** team software development module at *Newcastle University*.
 
-###Getting Started
+### Getting Started
 Start by downloading the required packages. Make sure you are in the **/root** folder of the 
 project and input the command below in the ````Terminal```` to download require packages:
 ````
@@ -12,34 +12,34 @@ After the package installation is complete run the program in the ````Terminal``
 ````
 npm run dev
 ````
-###Usage
+### Usage
 Once the program will start it will open a browser window, and you will be greeted with a home page of the banking
 platform. There are three pages on the navigation bar - **Home**, **FAQ** and **Login**.
 + **Home** page is the home page of our banking platform which is accessible to all clients without logging in.
 + **FAQ** page has some common questions and answers about our banking platform.
 + **Login** page lets you to login to your current account or register a new bank account on our banking platform.
 
-####User Access
+#### User Access
 Click *Get Started*, *Make an Account Now* buttons or go to **Login** page on navigation bar to create a new account. 
 After creating an account you will be redirected to a bank account overview page.
 
 On the overview page scan the bar code with Google Authenticator app on your smartphone to activate 2FA. It's important
 to do this because there will be no way to login without it after you exit the application.
 
-#####Google Authenticator Activation Process
+##### Google Authenticator Activation Process
 
 Go to **App Store** on your iPhone or **Google Play Store** on your Android device and search for 
 **Google Authenticator**. Click on the top option and install.
 
-![Image](client/public/images/Play%20Store%20Search.jpg)
+<img src="client/public/images/Play%20Store%20Search.jpg" width="40%" alt="">
 
-![Image](client/public/images/Play%20Store%20Authenticator.jpg)
+<img src="client/public/images/Play%20Store%20Authenticator.jpg" width="40%" alt="">
 
 After installation, open **Authenticator** app and click the plus symbol on the bottom right to scan the bar code. Once
 it's done it is all set up and there should be 6 number code which changes each 30 seconds. This will be used the next 
 time you will try to login to your account.
 
-####User Account Functionality
+#### User Account Functionality
 User bank account has four pages which you can see on the navigation bar on the left - **Overview**, **Transactions**, 
 **Account** and **Cards**. 
 + **Overview** page shows 6 most recent transactions as well as the balance of your GBP, USD and EUR account. 
@@ -63,7 +63,7 @@ clicking *Amend* button. If you want to delete and account, click *Delete Accoun
 You can log out by pressing red *Logout* button in the top right corner and confirming your choice. You will be
 redirected to **Login** page.
 
-###Admin Account
+### Admin Account
 To access admin account you will login as usual from *login* page, however, because there is no way to create an admin
 account for the regular user, one admin account is already created in the database. Admin account details:
 
