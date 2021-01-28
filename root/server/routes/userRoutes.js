@@ -89,8 +89,8 @@ router.post("/register", async(req, res) => {
                 return res.status(400).json({msg: "An account with this email already exists."});
             }
         }
-        const phonenums = await User.find({}, {phoneNum: 1});
-        for (let item of phonenums) {
+        const phoneNums = await User.find({}, {phoneNum: 1});
+        for (let item of phoneNums) {
             if (aesDecrypt(item.phoneNum) === phoneNum) {
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
@@ -358,9 +358,11 @@ router.post("/amendDetails", async (req, res) =>{
                 return res.status(400).json({msg: "An account with this email already exists."});
             }
         }
-
-        const phonenums = await User.find({},{phoneNum: 1});
-        for(let item of phonenums) {
+        if (!(phoneNum.match(/^(07\d{8,12}|447\d{7,11})$/))) {
+            return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number (e.g 07123123123 or 447123123123)"});
+        }
+        const phoneNums = await User.find({},{phoneNum: 1});
+        for(let item of phoneNums) {
             if (aesDecrypt(item.phoneNum) === phoneNum && phoneNum !== aesDecrypt(oldUser.phoneNum)) {
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
