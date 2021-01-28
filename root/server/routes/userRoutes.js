@@ -8,7 +8,7 @@ const money = require("money");
 const oxr = require("open-exchange-rates")
 oxr.set({ app_id: 'ec27af52e4214a3eae3323dd2710dee0' })
 oxr.latest(function() {
-    // Apply exchange rates and base rate to `fx` library object:
+    //Load exchange rates
     money.rates = oxr.rates;
     money.base = oxr.base;
 });
@@ -22,6 +22,7 @@ function aesEncrypt(data) {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
 }
+//decrypts data using aes, returns the decrypted strings
 function aesDecrypt(data) {
     const crypto = require('crypto');
     const key = String(data.get('key'));
@@ -35,6 +36,7 @@ function aesDecrypt(data) {
 
 async function getUserData(PID){
     let userData = await User.findOne({personalID: PID})
+    //decrypts transactions
     for(let transaction of userData.transactions){
         transaction.date = aesDecrypt(new Map([['data', transaction.date.data],['iv', transaction.date.iv],['key', transaction.date.key]]))
         transaction.amountIn = aesDecrypt(new Map([['data', transaction.amountIn.data],['iv', transaction.amountIn.iv],['key', transaction.amountIn.key]]))
@@ -73,7 +75,7 @@ router.post("/register", async(req, res) => {
     try {
         let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName, role} = req.body;
 
-        // validate
+        //check all data is present and valid
         if (!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
         if (!(firstName.match(/^[A-Za-z\-]+$/)) || (!(lastName.match(/^[A-Za-z\-]+$/))))
@@ -105,10 +107,10 @@ router.post("/register", async(req, res) => {
             return res.status(400).json({msg: "Password is not valid"});
         if (!(personalID.match(/\d{11}$/)))
             return res.status(400).json({msg: "Please enter exactly 11 digits for the personal ID number"});
-
+        //hash password with bcrypt
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
-
+        //generate 2FA info
         let totpSecret = speakeasy.generateSecret({
             name: "StuBank Plc"
         });
@@ -129,6 +131,7 @@ router.post("/register", async(req, res) => {
             role: role
         })
         const savedUser = await newUser.save();
+        //generate jwt token
         const token = jwt.sign({id: savedUser._id}, process.env.JWT_PWD)
         const userData = await getUserData(personalID)
         res.json({
@@ -144,9 +147,10 @@ router.post("/register", async(req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const {personalID, password} = req.body;
-        //validate
+        //check all data is present
         if ((!personalID || !password))
             return res.status(400).json({msg: "One or more required fields are blank"})
+        //get user data from database and check login data is valid
         const user = await User.findOne({personalID: personalID});
         if (!user)
             return res.status(400).json({msg: "This user does not exist"});
@@ -167,6 +171,7 @@ router.post("/login", async (req, res) => {
 
 router.delete("/delete", auth, async (req, res) => {
     try {
+        //find and delete user from database
         const deletedUser = await User.findByIdAndDelete(req.user);
         res.json(deletedUser);
     }
@@ -177,6 +182,7 @@ router.delete("/delete", auth, async (req, res) => {
 
 router.post("/tokenIsValid", async (req, res) =>{
     try {
+        //validate jwt token
         const token = req.header("x-auth-token");
         if (!token)
             return res.json(false);
@@ -194,11 +200,14 @@ router.post("/tokenIsValid", async (req, res) =>{
 
 function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, currency){
     let date = new Date()
+    //generate date
     date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
+    //calculate new user balances and check if payer has sufficient funds
     payerBalance = parseFloat(Number(aesDecrypt(payerBalance)) - Number(amount)).toFixed(2)
     if (Number(payerBalance) < 0) {return false}
     else {payerBalance = aesEncrypt(payerBalance)}
     payeeBalance = aesEncrypt((parseFloat(aesDecrypt(payeeBalance)) + parseFloat(amount)).toFixed(2))
+    //generate transactions for both users
     const transactionIn = {date, amountIn: aesEncrypt(amount), amountOut: aesEncrypt(''), account: payerID,
         balance: payeeBalance, currency}
     const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(amount), account: payeeID.value,
@@ -209,6 +218,7 @@ function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, cur
 router.post("/transfer", async (req, res) =>{
     try{
         const {payerID, payeeID, amount, currency} = req.body
+        //check data is valid
         if (payerID === payeeID.value)
             return res.status(400).json({msg: "This is your account. Please choose another"});
         if (!(payeeID.value.match(/^\d{11}$/)))
@@ -221,11 +231,14 @@ router.post("/transfer", async (req, res) =>{
             let payer
             payer = await User.findOne({personalID: payerID});
             let data
+            //determine which currency balance to change
             switch (currency) {
                 case '£':
+                    //calculate new balances and generate transactions
                     data = transferMoney(payee.accountBalanceGBP, payer.accountBalanceGBP, payeeID, payerID.value, amount, currency)
                     if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
                     else {
+                        //update balances
                         payee.accountBalanceGBP = data.payeeBalance
                         payer.accountBalanceGBP = data.payerBalance
                     }
@@ -247,10 +260,13 @@ router.post("/transfer", async (req, res) =>{
                     }
                     break
             }
+            //add transactions to arrays
             payer.transactions.push(data.transactionOut)
             payee.transactions.push(data.transactionIn)
+            //add new recipient
             if (payeeID.__isNew__ !== undefined)
                 payer.recipients.push({label: payeeID.label, value: payeeID.value})
+            //save changes
             payee.save()
             payer.save()
             res.json()
@@ -266,6 +282,7 @@ router.post("/transfer", async (req, res) =>{
 router.post("/updateData", async (req, res) =>{
     try{
         const {PID} = req.body
+        //fetch data
         const newData = await getUserData(PID)
         res.json(newData.user)
     }
@@ -277,13 +294,16 @@ router.post("/updateData", async (req, res) =>{
 router.post("/newVirtualCard", async (req, res) =>{
     try{
         const {cardNumber, CVV, frozen, PID} = req.body
+        //check required data
         if ((!cardNumber || !CVV))
             return res.status(400).json({msg: "One or more required fields are blank"})
         let userData
+        //fetch and update user data
         userData = await User.findOne({personalID: PID})
         userData.cardNumber = aesEncrypt(cardNumber)
         userData.CVV = aesEncrypt(CVV)
         userData.frozenCard = frozen
+        //save user data
         userData.save()
         res.json()
     }
@@ -324,7 +344,7 @@ router.post("/amendDetails", async (req, res) =>{
             accountBalanceEUR} = req.body;
         let oldUser
         oldUser = await User.findOne({personalID})
-        // validate
+        //check all data is present
         if(!email || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
         if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
@@ -345,8 +365,9 @@ router.post("/amendDetails", async (req, res) =>{
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
         }
-
+        //check if password is being changed
         if (passwordOld || passwordNew || passwordCheck) {
+            //check all passwords data is valid
             const matchTrue = await bcrypt.compare(passwordOld, oldUser.password);
             if(!matchTrue)
                 return res.status(400).json({msg: "Incorrect current password"})
@@ -354,11 +375,11 @@ router.post("/amendDetails", async (req, res) =>{
                 return res.status(400).json({msg: "Enter new password twice to ensure new password has been entered correctly"});
             if (!(passwordNew.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
                 return res.status(400).json({msg: "New password is not valid"});
-
+            //hash password
             const salt = await bcrypt.genSalt();
             oldUser.password = await bcrypt.hash(passwordNew, salt);
         }
-
+        //encrypt data
         oldUser.email = aesEncrypt(email)
         oldUser.firstName = aesEncrypt(firstName)
         oldUser.lastName = aesEncrypt(lastName)
@@ -372,6 +393,7 @@ router.post("/amendDetails", async (req, res) =>{
         if (accountBalanceEUR) {
             oldUser.accountBalanceEUR = aesEncrypt(parseFloat(accountBalanceEUR).toFixed(2))
         }
+        //save data
         await oldUser.save()
         res.json()
     }
@@ -381,12 +403,15 @@ router.post("/amendDetails", async (req, res) =>{
 })
 
 function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbolTo, symbolFrom, amount, personalID){
+    //generate dat
     let date = new Date()
     date = aesEncrypt(String(("0" + date.getDate()).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear()))
+    //calculate new balances
     balanceTo = aesEncrypt(parseFloat(Number(aesDecrypt(balanceTo))
         + Number(money.convert(Number(amount), {from: currencyFrom, to: (currencyTo)}))).toFixed(2))
     balanceFrom = aesEncrypt(parseFloat(Number(aesDecrypt(balanceFrom))
         - Number(amount)).toFixed(2))
+    //generate transactions
     const transactionOut = {date, amountIn: aesEncrypt(''), amountOut: aesEncrypt(String(amount)), account: personalID,
         balance: balanceFrom, currency: symbolFrom}
     const transactionIn = {date, amountIn: aesEncrypt(String(parseFloat(money.convert(Number(amount), {from: currencyFrom, to: currencyTo})).toFixed(2))),
@@ -397,6 +422,7 @@ function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbo
 router.post("/convert", async (req, res) =>{
     try{
         const {personalID, amount, to, from} = req.body
+        //check all data is valid
         if (!(amount.match(/^\d+[.]\d{1,2}$/)) && !(amount.match(/^\d+$/)))
             return res.status(400).json({msg: "Please enter a monetary value"});
         if (to === from)
@@ -405,12 +431,16 @@ router.post("/convert", async (req, res) =>{
         user = await User.findOne({personalID: personalID});
         let data
         switch (from){
+            //determine currency
             case '£':
+                //check for sufficient funds
                 if (parseFloat(Number(aesDecrypt(user.accountBalanceGBP)) - Number(amount)).toFixed(2) < 0)
                     return res.status(400).json({msg: "Insufficient funds"});
                 switch (to) {
                     case '$':
+                        //get new balances and generate new transactions
                         data = convertCurrency(user.accountBalanceUSD, user.accountBalanceGBP, "USD", "GBP", to, from, amount, personalID)
+                        //update balances
                         user.accountBalanceUSD = data.balanceTo
                         user.accountBalanceGBP = data.balanceFrom
                         break
@@ -454,8 +484,10 @@ router.post("/convert", async (req, res) =>{
                 }
                 break
         }
+        //add new transactions to array
         user.transactions.push(data.transactionOut)
         user.transactions.push(data.transactionIn)
+        //save changes
         user.save()
         res.json()
     }
@@ -466,8 +498,10 @@ router.post("/convert", async (req, res) =>{
 
 router.post("/getAll", async (req, res) => {
     try{
+        //fetch all relevant user data
         let data = await User.find({}, {personalID: 1, firstName: 1, lastName: 1, role: 1, accountBalanceGBP: 1, accountBalanceUSD: 1, accountBalanceEUR: 1});
         for(let user of data){
+            //decrypt user data
             user.firstName = {data: aesDecrypt(user.firstName)}
             user.lastName = {data: aesDecrypt(user.lastName)}
             user.accountBalanceGBP = {data: aesDecrypt(user.accountBalanceGBP)}
