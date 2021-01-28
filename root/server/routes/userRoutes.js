@@ -74,27 +74,27 @@ router.post("/register", async(req, res) => {
         let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName, role} = req.body;
 
         // validate
-        if(!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
+        if (!email || !password || !passwordCheck || !personalID || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
-        if (!(firstName.match(/^[A-Za-z\-]+$/) )||(!(lastName.match(/^[A-Za-z\-]+$/))))
+        if (!(firstName.match(/^[A-Za-z\-]+$/)) || (!(lastName.match(/^[A-Za-z\-]+$/))))
             return res.status(400).json({msg: "Please ensure only letters are used for the first name and last name fields"});
-        if(password !== passwordCheck)
+        if (password !== passwordCheck)
             return res.status(400).json({msg: "Passwords do not match"});
 
-        const emails = await User.find({},{email: 1});
-        for(let item of emails){
-            if (aesDecrypt(item.email) === email){
+        const emails = await User.find({}, {email: 1});
+        for (let item of emails) {
+            if (aesDecrypt(item.email) === email) {
                 return res.status(400).json({msg: "An account with this email already exists."});
             }
         }
-        const phonenums = await User.find({},{phoneNum: 1});
-        for(let item of phonenums){
-            if (aesDecrypt(item.phoneNum) === phoneNum){
+        const phonenums = await User.find({}, {phoneNum: 1});
+        for (let item of phonenums) {
+            if (aesDecrypt(item.phoneNum) === phoneNum) {
                 return res.status(400).json({msg: "An account with this phone number already exists."});
             }
         }
         const existingPID = await User.findOne({personalID: personalID});
-        if(existingPID)
+        if (existingPID)
             return res.status(400).json({msg: "An account with this personal ID already exists."});
         if (!(phoneNum.match(/^(07\d{8,12}|447\d{7,11})$/))) {
             return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number (e.g 07123123123 or 447123123123)"});
@@ -129,8 +129,14 @@ router.post("/register", async(req, res) => {
             role: role
         })
         const savedUser = await newUser.save();
-        res.json(savedUser);
-    } catch(err){
+        const token = jwt.sign({id: savedUser._id}, process.env.JWT_PWD)
+        const userData = await getUserData(personalID)
+        res.json({
+            token,
+            user: userData.user
+        });
+
+} catch(err){
         res.status(500).json({error: err.message} );
     }
 
@@ -141,15 +147,14 @@ router.post("/login", async (req, res) => {
         //validate
         if ((!personalID || !password))
             return res.status(400).json({msg: "One or more required fields are blank"})
-
         const user = await User.findOne({personalID: personalID});
         if (!user)
             return res.status(400).json({msg: "This user does not exist"});
         const matchTrue = await bcrypt.compare(password, user.password);
+        console.log("bcrypt compare is working: " + matchTrue)
         if (!matchTrue)
             return res.status(400).json({msg: "Incorrect password"})
         const token = jwt.sign({id: user._id}, process.env.JWT_PWD)
-
         const userData = await getUserData(personalID)
         res.json({
             token,
