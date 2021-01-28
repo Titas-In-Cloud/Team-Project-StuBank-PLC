@@ -2,7 +2,7 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import BankLogo from "../images/bank-logo.png";
 
-function NavigationBar(props) {
+function NavigationBar() {
     return (
         <header>
             <div className="container">
@@ -16,12 +16,6 @@ function NavigationBar(props) {
                     <ul className="nav-list">
                         <li className="nav-item">
                             <Link class="nav-link" to="/home">Home</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link class="nav-link" to="/features">Features</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link class="nav-link" to="/about_us">About Us</Link>
                         </li>
                         <li className="nav-item">
                             <Link class="nav-link" to="/FAQ">FAQ</Link>
