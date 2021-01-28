@@ -24,13 +24,13 @@ export default function Settings () {
             token: undefined,
             user: undefined
         })
-        localStorage.setItem("auth-token", "")
+        sessionStorage.clear()
     }
     //This deletes the user account
     async function handleDeleteAccount() {
         try {
                 //Gets auth token from local storage and saves to a variable
-                const token = localStorage.getItem('auth-token');
+                const token = sessionStorage.getItem('auth-token');
                 const request = Axios.create({
                     headers: {
                         "x-auth-token": token
