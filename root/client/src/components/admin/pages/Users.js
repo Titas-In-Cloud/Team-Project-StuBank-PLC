@@ -6,20 +6,16 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import {useHistory} from "react-router-dom";
 
 export default function Users () {
-    let userDataToAmend = "";
     const userData = JSON.parse(sessionStorage.getItem("userData"))
-    //Sets user data to the logged in admin user if it is null to prevent null pointer errors
-    if (!userDataToAmend) {
-        userDataToAmend = JSON.parse(sessionStorage.getItem("userData"));
-    }
     const history = useHistory();
     if (userData == null || userData.role !== "admin") {
         sessionStorage.clear()
         history.push('/home')
         history.go(0)
     }
+    const [userDataToAmend, setUserDataToAmend] = useState(userData)
     const [allUsers, setAllUsers] = useState([])
-    const [personalID, setPersonalID] = useState(undefined);
+    const [personalID, setPersonalID] = useState(userDataToAmend.personalID);
     const [showAmend, setShowAmend] = useState(false);
     const [error, setError] = useState();
     const [email, setEmail] = useState(userDataToAmend.email.data);
@@ -32,11 +28,11 @@ export default function Users () {
 
     async function updateData() {
         try {
+            console.log('update')
             const newUsers = await Axios.post("http://localhost:5000/users/getAll")
             setAllUsers(newUsers.data)
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
-            userDataToAmend = newData.data
-            setShowAmend(false)
+            await setUserDataToAmend(newData.data)
             setEmail(userDataToAmend.email.data)
             setFirstName(userDataToAmend.firstName.data)
             setLastName(userDataToAmend.lastName.data)
@@ -52,12 +48,20 @@ export default function Users () {
     async function getUserData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
-            userDataToAmend = newData.data
-            setShowAmend(!showAmend)
+            await setEmail(newData.data.email.data)
+            await setFirstName(newData.data.firstName.data)
+            await setLastName(newData.data.lastName.data)
+            await setPhoneNum(newData.data.phoneNum.data)
+            await setBalanceGBP(newData.data.accountBalanceGBP.data)
+            await setBalanceUSD(newData.data.accountBalanceUSD.data)
+            await setBalanceEUR(newData.data.accountBalanceEUR.data)
+            setShowAmend(false)
+            setShowAmend(true)
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }
     }
+
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -98,10 +102,13 @@ export default function Users () {
     async function submitAmend(e){
         e.preventDefault()
         try {
+            console.log(email)
             const data = {email, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
                 accountBalanceEUR}
+            console.log(data)
             await Axios.post("http://localhost:5000/users/amendDetails", data)
             await updateData()
+            setShowAmend(false)
         } catch (err) {
             err.response.data.msg && setError(err.response.data.msg)
         }
@@ -182,7 +189,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="register-first-name"
                                         type="text"
-                                        defaultValue={userDataToAmend.firstName.data}
+                                        defaultValue={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                     />
                                 </div>
@@ -193,7 +200,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="register-last-name"
                                         type="text"
-                                        defaultValue={userDataToAmend.lastName.data}
+                                        defaultValue={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                     />
                                 </div>
@@ -204,7 +211,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="register-phone-num"
                                         type="text"
-                                        defaultValue={userDataToAmend.phoneNum.data}
+                                        defaultValue={phoneNum}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                     />
                                 </div>
@@ -215,7 +222,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="register-email"
                                         type="text"
-                                        defaultValue={userDataToAmend.email.data}
+                                        defaultValue={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
                                 </div>
@@ -226,7 +233,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="gbp-balance"
                                         type="text"
-                                        defaultValue={userDataToAmend.accountBalanceGBP.data}
+                                        defaultValue={accountBalanceGBP}
                                         onChange={(e) => setBalanceGBP(e.target.value)}
                                     />
                                 </div>
@@ -237,7 +244,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="usd-balance"
                                         type="text"
-                                        defaultValue={userDataToAmend.accountBalanceUSD.data}
+                                        defaultValue={accountBalanceUSD}
                                         onChange={(e) => setBalanceUSD(e.target.value)}
                                     />
                                 </div>
@@ -248,7 +255,7 @@ export default function Users () {
                                         className="input-settings"
                                         id="eur-balance"
                                         type="text"
-                                        defaultValue={userDataToAmend.accountBalanceEUR.data}
+                                        defaultValue={accountBalanceEUR}
                                         onChange={(e) => setBalanceEUR(e.target.value)}
                                     />
                                 </div>
