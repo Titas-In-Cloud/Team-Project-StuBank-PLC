@@ -28,7 +28,6 @@ export default function Users () {
 
     async function updateData() {
         try {
-            console.log('update')
             const newUsers = await Axios.post("http://localhost:5000/users/getAll")
             setAllUsers(newUsers.data)
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
