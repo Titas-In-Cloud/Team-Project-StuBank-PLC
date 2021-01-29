@@ -124,10 +124,8 @@ export default function Users () {
     async function submitAmend(e){
         e.preventDefault()
         try {
-            console.log(email)
             const data = {email, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
                 accountBalanceEUR}
-            console.log(data)
             await Axios.post("http://localhost:5000/users/amendDetails", data)
             await updateData()
             setShowAmend(false)
