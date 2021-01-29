@@ -238,7 +238,7 @@ router.post("/transfer", async (req, res) =>{
             switch (currency) {
                 case '£':
                     //calculate new balances and generate transactions
-                    data = transferMoney(payee.accountBalanceGBP, payer.accountBalanceGBP, payeeID, payerID.value, amount, currency)
+                    data = transferMoney(payee.accountBalanceGBP, payer.accountBalanceGBP, payeeID, payerID, amount, currency)
                     if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
                     else {
                         //update balances
@@ -247,7 +247,7 @@ router.post("/transfer", async (req, res) =>{
                     }
                     break
                 case '$':
-                    data = transferMoney(payee.accountBalanceUSD, payer.accountBalanceUSD, payeeID, payerID.value, amount, currency)
+                    data = transferMoney(payee.accountBalanceUSD, payer.accountBalanceUSD, payeeID, payerID, amount, currency)
                     if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
                     else {
                         payee.accountBalanceUSD = data.payeeBalance
@@ -255,7 +255,7 @@ router.post("/transfer", async (req, res) =>{
                     }
                     break
                 case '€':
-                    data = transferMoney(payee.accountBalanceEUR, payer.accountBalanceEUR, payeeID, payerID.value, amount, currency)
+                    data = transferMoney(payee.accountBalanceEUR, payer.accountBalanceEUR, payeeID, payerID, amount, currency)
                     if (data === false) {return res.status(400).json({msg: "Insufficient funds"})}
                     else {
                         payee.accountBalanceEUR = data.payeeBalance
