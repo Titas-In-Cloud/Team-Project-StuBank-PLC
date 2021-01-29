@@ -178,7 +178,7 @@ export default function Settings () {
                             <input
                                 className="input-settings"
                                 id="register-phone-num"
-                                type="tel"
+                                type="text"
                                 placeholder="Telephone Number"
                                 defaultValue={user.phoneNum.data}
                                 onChange={(e) => setPhoneNum(e.target.value)}
@@ -188,7 +188,7 @@ export default function Settings () {
                             <input
                                 className="input-settings"
                                 id="register-email"
-                                type="email"
+                                type="text"
                                 placeholder="Email Address"
                                 defaultValue={user.email.data}
                                 onChange={(e) => setEmail(e.target.value)}

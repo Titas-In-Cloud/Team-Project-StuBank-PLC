@@ -203,7 +203,7 @@ export default function Users () {
                                     <input
                                         className="input-settings"
                                         id="register-phone-num"
-                                        type="tel"
+                                        type="text"
                                         defaultValue={userDataToAmend.phoneNum.data}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                     />
@@ -214,7 +214,7 @@ export default function Users () {
                                     <input
                                         className="input-settings"
                                         id="register-email"
-                                        type="email"
+                                        type="text"
                                         defaultValue={userDataToAmend.email.data}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
