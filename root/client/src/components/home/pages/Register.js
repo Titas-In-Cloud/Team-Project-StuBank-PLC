@@ -10,6 +10,11 @@ import LockLogo from "../../images/lock-logo.png";
 import TelephoneLogo from "../../images/telephone-logo.png";
 import EmailLogo from "../../images/email-logo.png";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Register () {
     const [email, setEmail] = useState(undefined);
     const [firstName, setFirstName] = useState(undefined);
@@ -22,7 +27,13 @@ export default function Register () {
     const { setUserData } = useContext(UserContext);
     const role = "user";
     const history = useHistory();
+    //logs out user if they navigate to this page whilst logged in
     sessionStorage.clear()
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     const submit = async (e) => {
         e.preventDefault();
         try {

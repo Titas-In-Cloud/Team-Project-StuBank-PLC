@@ -1,5 +1,12 @@
 const jwt = require("jsonwebtoken");
-
+//handles jwt verification
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
 const auth = (req, res, next) => {
     try {
         const token = req.header("x-auth-token");

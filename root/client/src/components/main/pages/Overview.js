@@ -5,6 +5,11 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import {useHistory} from "react-router-dom";
 import Axios from "axios";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Overview() {
     let user = JSON.parse(sessionStorage.getItem("userData"));
     const history = useHistory();
@@ -13,6 +18,11 @@ export default function Overview() {
         history.push('/home')
         history.go(0)
     }
+
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -40,6 +50,7 @@ export default function Overview() {
         history.go(0)
     }
 
+    //checks user is logged in when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){

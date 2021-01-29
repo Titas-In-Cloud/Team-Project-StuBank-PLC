@@ -3,7 +3,13 @@ import { HomeNavigationBar } from "../../";
 import {Link} from "react-router-dom";
 import Logo from "../../images/testimonial-profile-picture.jpg";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Home() {
+    //logs out user if they navigate to this page whilst logged in
     sessionStorage.clear()
     return (
         <div>

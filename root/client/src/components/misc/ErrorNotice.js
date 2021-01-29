@@ -1,5 +1,11 @@
 import React from "react";
 //Displays an error
+/**
+ *
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function ErrorNotice(props) {
     //Displays error message from server side
     return (

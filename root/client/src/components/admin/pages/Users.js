@@ -5,6 +5,11 @@ import ErrorNotice from "../../misc/ErrorNotice";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {useHistory} from "react-router-dom";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Users () {
     const userData = JSON.parse(sessionStorage.getItem("userData"))
     const history = useHistory();
@@ -26,6 +31,10 @@ export default function Users () {
     const [accountBalanceUSD, setBalanceUSD] = useState(userDataToAmend.accountBalanceUSD.data);
     const [accountBalanceEUR, setBalanceEUR] = useState(userDataToAmend.accountBalanceEUR.data);
 
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function updateData() {
         try {
             const newUsers = await Axios.post("http://localhost:5000/users/getAll")
@@ -44,6 +53,10 @@ export default function Users () {
         }
     }
 
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function getUserData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: personalID})
@@ -61,6 +74,10 @@ export default function Users () {
         }
     }
 
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -88,6 +105,7 @@ export default function Users () {
         history.go(0)
     }
 
+    //checks user is logged in and updates data when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){
@@ -98,6 +116,11 @@ export default function Users () {
         updateData();
     }, []);
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function submitAmend(e){
         e.preventDefault()
         try {

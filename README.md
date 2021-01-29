@@ -79,11 +79,11 @@ redirected to **Login** page.
 To access admin account you will login as usual from *login* page, however, because there is no way to create an admin
 account for the regular user, one admin account is already created in the database. Admin account details:
 
-**Personal ID**:
+**Personal ID**: 11111111111
 
-**Password**:
+**Password**: Password11
 
-Login with these details to access admin account.
+Login with these details to access admin account. Google authenticator is not required for the admin account
 
 After login you will see 2 pages on the navigation bar on the left - **Users** and **New Admin**. 
 + **Users** page shows 

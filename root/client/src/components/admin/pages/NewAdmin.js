@@ -4,6 +4,11 @@ import Axios from "axios";
 import ErrorNotice from "../../misc/ErrorNotice";
 import {useHistory} from "react-router-dom";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function NewAdmin () {
     const [email, setEmail] = useState(undefined);
     const [firstName, setFirstName] = useState(undefined);
@@ -16,6 +21,10 @@ export default function NewAdmin () {
     const [error, setError] = useState();
     const history = useHistory();
 
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -42,7 +51,7 @@ export default function NewAdmin () {
         history.push('/home')
         history.go(0)
     }
-
+    //checks user is logged in when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){
@@ -52,6 +61,11 @@ export default function NewAdmin () {
         }
     }, []);
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     const submit = async (e) => {
         e.preventDefault();
         try {

@@ -2,6 +2,11 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import BankLogo from "../images/bank-logo.png";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function NavigationBar() {
     return (
         <header>
