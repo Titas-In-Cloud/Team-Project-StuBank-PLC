@@ -6,6 +6,11 @@ import { Users, NewAdmin } from "./components";
 import UserContext from "./context/UserContext";
 import Axios from "axios";
 
+/**
+ * Contains a router to determine which route loads which page
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function App() {
     const [userData, setUserData] = useState({
         token: undefined,
