@@ -6,6 +6,12 @@ import CreatableSelect from 'react-select/creatable';
 import { MainNavigationBar } from "../../";
 import {useHistory} from "react-router-dom";
 
+/**
+ * Displays the users account information and allows them transfer money to another account or be able to convert
+ * money in the account between different currencies
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Account () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
     const history = useHistory();
@@ -28,6 +34,10 @@ export default function Account () {
     const [currencyTo, setCurrencyTo] = useState('£');
     const [currencyFrom, setCurrencyFrom] = useState('£');
 
+    /**
+     * This updates the users data in the database
+     * @returns {Promise<void>}
+     */
     async function updateData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: user.personalID})
@@ -51,6 +61,7 @@ export default function Account () {
         }
     }
 
+
     async function checkLoggedIn() {
         try {
             if (user.role !== 'user'){
@@ -71,7 +82,7 @@ export default function Account () {
             }
             return true
         } catch (err) {
-            //err.response.data.msg
+            // err.response.data.msg
         }
     }
 

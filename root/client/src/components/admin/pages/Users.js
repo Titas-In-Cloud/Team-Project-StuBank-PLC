@@ -183,44 +183,44 @@ export default function Users () {
                                     )}
                                 </div>
 
-                                <label htmlFor="register-first-name">First Name</label>
+                                <label htmlFor="amend-first-name">First Name</label>
                                 <div style={{paddingBottom: 10, paddingTop: 3}}>
                                     <input
                                         className="input-settings"
-                                        id="register-first-name"
+                                        id="amend-first-name"
                                         type="text"
                                         defaultValue={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                     />
                                 </div>
 
-                                <label htmlFor="register-last-name">Last Name</label>
+                                <label htmlFor="amend-last-name">Last Name</label>
                                 <div style={{paddingBottom: 10, paddingTop: 3}}>
                                     <input
                                         className="input-settings"
-                                        id="register-last-name"
+                                        id="amend-last-name"
                                         type="text"
                                         defaultValue={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                     />
                                 </div>
 
-                                <label htmlFor="register-phone-num">Telephone Number</label>
+                                <label htmlFor="amend-phone-num">Telephone Number</label>
                                 <div style={{paddingBottom: 10, paddingTop: 3}}>
                                     <input
                                         className="input-settings"
-                                        id="register-phone-num"
+                                        id="amend-phone-num"
                                         type="text"
                                         defaultValue={phoneNum}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                     />
                                 </div>
 
-                                <label htmlFor="register-email">Email Address</label>
+                                <label htmlFor="amend-email">Email Address</label>
                                 <div style={{paddingBottom: 10, paddingTop: 3}}>
                                     <input
                                         className="input-settings"
-                                        id="register-email"
+                                        id="amend-email"
                                         type="text"
                                         defaultValue={email}
                                         onChange={(e) => setEmail(e.target.value)}

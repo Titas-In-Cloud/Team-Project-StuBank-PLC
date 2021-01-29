@@ -347,6 +347,7 @@ router.post("/amendDetails", async (req, res) =>{
             accountBalanceEUR} = req.body;
         let oldUser
         oldUser = await User.findOne({personalID})
+        console.log("PID backend" + personalID);
         //check all data is present
         if(!email || !phoneNum || !firstName || !lastName)
             return res.status(400).json({msg: "One or more required fields are blank"});
