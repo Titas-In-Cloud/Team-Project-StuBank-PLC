@@ -13,6 +13,11 @@ oxr.latest(function() {
     money.base = oxr.base;
 });
 //encrypts data using aes, returns the encrypted data, the iv, and the key all as hexadecimal strings
+/**
+ *
+ * @param data
+ * @returns {{data: string, iv: string, key: string}}
+ */
 function aesEncrypt(data) {
     const crypto = require('crypto');
     const key = crypto.randomBytes(16).toString('hex');
@@ -23,6 +28,11 @@ function aesEncrypt(data) {
     return {data: encrypted.toString('hex'), iv: iv.toString('hex'), key};
 }
 //decrypts data using aes, returns the decrypted strings
+/**
+ *
+ * @param data
+ * @returns {string}
+ */
 function aesDecrypt(data) {
     const crypto = require('crypto');
     const key = String(data.get('key'));
@@ -33,7 +43,12 @@ function aesDecrypt(data) {
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();
 }
-
+//fetches all user data for the personal ID provided
+/**
+ *
+ * @param PID
+ * @returns {Promise<{user: {lastName: {data: string}, accountBalanceEUR: {data: string}, personalID: *, CVV: {data: string}, role: *, accountBalanceUSD: {data: string}, phoneNum: {data: string}, transactions: *, frozenCard: *, firstName: {data: string}, totpSecret: any, accountBalanceGBP: {data: string}, recipients: *, id: *, email: {data: string}, cardNumber: {data: string}}}>}
+ */
 async function getUserData(PID){
     let userData = await User.findOne({personalID: PID})
     //decrypts transactions
@@ -71,6 +86,7 @@ async function getUserData(PID){
         }
     }
 }
+//registers the user with the data provided
 router.post("/register", async(req, res) => {
     try {
         let {email, password, passwordCheck, personalID, phoneNum, firstName, lastName, role} = req.body;
@@ -124,9 +140,9 @@ router.post("/register", async(req, res) => {
             phoneNum: aesEncrypt(phoneNum),
             firstName: aesEncrypt(firstName),
             lastName: aesEncrypt(lastName),
-            accountBalanceGBP: aesEncrypt('50'),
-            accountBalanceUSD: aesEncrypt('50'),
-            accountBalanceEUR: aesEncrypt('50'),
+            accountBalanceGBP: aesEncrypt(parseFloat('50').toFixed(2)),
+            accountBalanceUSD: aesEncrypt(parseFloat('50').toFixed(2)),
+            accountBalanceEUR: aesEncrypt(parseFloat('50').toFixed(2)),
             totpSecret: aesEncrypt(JSON.stringify(totpSecret)),
             cardNumber: aesEncrypt(''),
             CVV: aesEncrypt(''),
@@ -147,6 +163,7 @@ router.post("/register", async(req, res) => {
     }
 
 });
+//attempts a login with the data provided
 router.post("/login", async (req, res) => {
     try {
         const {personalID, password} = req.body;
@@ -171,7 +188,7 @@ router.post("/login", async (req, res) => {
         res.status(500).json({error: err.message} );
     }
 });
-
+//deletes the provided user from the database
 router.delete("/delete", auth, async (req, res) => {
     try {
         //find and delete user from database
@@ -182,7 +199,7 @@ router.delete("/delete", auth, async (req, res) => {
         res.status(500).json({error: err.message})
     }
 })
-
+//verifies a JSON web token
 router.post("/tokenIsValid", async (req, res) =>{
     try {
         //validate jwt token
@@ -200,7 +217,17 @@ router.post("/tokenIsValid", async (req, res) =>{
         res.status(500).json({ error: err.message });
     }
 })
-
+//creates all data relevant to a transfer
+/**
+ *
+ * @param payeeBalance
+ * @param payerBalance
+ * @param payeeID
+ * @param payerID
+ * @param amount
+ * @param currency
+ * @returns {{transactionIn: {date: Date, balance: {data: string, iv: string, key: string}, amountIn: {data: string, iv: string, key: string}, amountOut: {data: string, iv: string, key: string}, currency: *, account: *}, payeeBalance: {data: string, iv: string, key: string}, payerBalance: {data: string, iv: string, key: string}, transactionOut: {date: Date, balance: {data: string, iv: string, key: string}, amountIn: {data: string, iv: string, key: string}, amountOut: {data: string, iv: string, key: string}, currency: *, account: *}}|boolean}
+ */
 function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, currency){
     let date = new Date()
     //generate date
@@ -217,7 +244,7 @@ function transferMoney(payeeBalance, payerBalance, payeeID, payerID, amount, cur
         balance: payerBalance, currency}
     return {payeeBalance, payerBalance, transactionIn, transactionOut}
 }
-
+//transfers money and saves relevant data
 router.post("/transfer", async (req, res) =>{
     try{
         const {payerID, payeeID, amount, currency} = req.body
@@ -281,7 +308,7 @@ router.post("/transfer", async (req, res) =>{
         res.status(500).json({ error: err.message });
     }
 })
-
+//fetches a users updated data
 router.post("/updateData", async (req, res) =>{
     try{
         const {PID} = req.body
@@ -293,7 +320,7 @@ router.post("/updateData", async (req, res) =>{
         res.status(500).json({ error: err.message });
     }
 })
-
+//saves a new virtual card
 router.post("/newVirtualCard", async (req, res) =>{
     try{
         const {cardNumber, CVV, frozen, PID} = req.body
@@ -323,7 +350,7 @@ router.post("/", auth, async (req, res) => {
         id: user._id,
     });
 });
-
+//validates 2FA
 router.post("/totp-validate", (request, response, next) => {
     // Check user 2FA code is valid and correct
     let verified = speakeasy.totp.verify({
@@ -340,7 +367,7 @@ router.post("/totp-validate", (request, response, next) => {
         return response.status(400).json({msg: "2FA Failed: incorrect google authenticator code"});
     }
 });
-
+//changes a users details to the new data provided
 router.post("/amendDetails", async (req, res) =>{
     try{
         let {email, passwordOld, passwordNew, passwordCheck, phoneNum, firstName, lastName, personalID, accountBalanceGBP, accountBalanceUSD,
@@ -408,6 +435,19 @@ router.post("/amendDetails", async (req, res) =>{
     }
 })
 
+/**
+ *
+ * @param balanceTo
+ * @param balanceFrom
+ * @param currencyTo
+ * @param currencyFrom
+ * @param symbolTo
+ * @param symbolFrom
+ * @param amount
+ * @param personalID
+ * @returns {{transactionIn: {date: Date, balance: {data: string, iv: string, key: string}, amountIn: {data: string, iv: string, key: string}, amountOut: {data: string, iv: string, key: string}, currency: *, account: *}, balanceFrom: {data: string, iv: string, key: string}, transactionOut: {date: Date, balance: {data: string, iv: string, key: string}, amountIn: {data: string, iv: string, key: string}, amountOut: {data: string, iv: string, key: string}, currency: *, account: *}, balanceTo: {data: string, iv: string, key: string}}}
+ */
+//creates all data relevant to a currency conversion
 function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbolTo, symbolFrom, amount, personalID){
     //generate dat
     let date = new Date()
@@ -424,7 +464,7 @@ function convertCurrency(balanceTo, balanceFrom, currencyTo, currencyFrom, symbo
         amountOut: aesEncrypt(''), account: personalID, balance: balanceTo, currency: symbolTo}
     return{balanceTo, balanceFrom, transactionOut, transactionIn}
 }
-
+//converts currency
 router.post("/convert", async (req, res) =>{
     try{
         const {personalID, amount, to, from} = req.body
@@ -501,7 +541,7 @@ router.post("/convert", async (req, res) =>{
         res.status(500).json({ error: err.message });
     }
 })
-
+//gets all user data for the admin page
 router.post("/getAll", async (req, res) => {
     try{
         //fetch all relevant user data
@@ -520,4 +560,5 @@ router.post("/getAll", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 })
+//allows routes to be access in other files
 module.exports = router;
