@@ -102,7 +102,7 @@ export default function NewAdmin () {
                         <div style={{paddingTop: 10}}>
                             <input
                                 className="input-settings"
-                                type="tel"
+                                type="text"
                                 placeholder="Telephone Number"
                                 id="register-phone-num"
                                 onChange={(e) => setPhoneNum(e.target.value)}
@@ -113,7 +113,7 @@ export default function NewAdmin () {
                         <div style={{paddingTop: 10}}>
                             <input
                                 className="input-settings"
-                                type="email"
+                                type="text"
                                 placeholder="Email Address"
                                 id="register-email"
                                 onChange={(e) => setEmail(e.target.value)}
