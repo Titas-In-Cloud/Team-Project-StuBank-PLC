@@ -1,7 +1,13 @@
 import React from "react";
 import { HomeNavigationBar } from "../../";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function FAQ () {
+    //logs out user if they navigate to this page whilst logged in
     sessionStorage.clear()
     return (
         <div>

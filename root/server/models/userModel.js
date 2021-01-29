@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 
+/**
+ *
+ * @type {module:mongoose.Schema<any>}
+ */
 const userSchema = new mongoose.Schema({
     email: {type: Map, of: String, required: true, unique: true},
     password: {type: String, required: true, minlength: 8},
@@ -18,5 +22,5 @@ const userSchema = new mongoose.Schema({
     frozenCard: {type: Boolean, required: true},
     role: {type: String, required:true}
 });
-
+//allows the model to be used in other files
 module.exports = User = mongoose.model("user", userSchema);

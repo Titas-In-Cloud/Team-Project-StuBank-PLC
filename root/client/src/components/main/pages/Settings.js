@@ -5,6 +5,11 @@ import {useHistory} from "react-router-dom";
 import UserContext from "../../../context/UserContext";
 import ErrorNotice from "../../misc/ErrorNotice";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Settings () {
     const history = useHistory();
     const {setUserData} = useContext(UserContext);
@@ -32,6 +37,10 @@ export default function Settings () {
         sessionStorage.clear()
     }
     //This deletes the user account
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function handleDeleteAccount() {
         try {
                 //Gets auth token from local storage and saves to a variable
@@ -51,7 +60,11 @@ export default function Settings () {
             err.response.data.msg && setErrorAmend(err.response.data.msg)
         }
     }
-
+    //updates user data
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function updateData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: user.personalID})
@@ -70,6 +83,10 @@ export default function Settings () {
         }
     }
 
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -96,7 +113,7 @@ export default function Settings () {
         history.push('/home')
         history.go(0)
     }
-
+    //checks user is logged in and then updates data when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){
@@ -107,6 +124,11 @@ export default function Settings () {
         updateData();
     }, []);
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function submitAmend(e){
         e.preventDefault()
         try {

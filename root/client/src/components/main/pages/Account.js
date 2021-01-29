@@ -62,6 +62,10 @@ export default function Account () {
     }
 
 
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             if (user.role !== 'user'){
@@ -93,6 +97,7 @@ export default function Account () {
         history.go(0)
     }
 
+    //checks user is logged in and then updates data when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){
@@ -103,19 +108,40 @@ export default function Account () {
         updateData();
     }, []);
 
+    /**
+     *
+     * @param input
+     */
     const recipientChange = (input) => {
         setRecipient(input)
     }
+    /**
+     *
+     * @param input
+     */
     const currencyChange = (input) => {
         setCurrency(input.target.value)
     }
+    /**
+     *
+     * @param input
+     */
     const currencyFromChange = (input) => {
         setCurrencyFrom(input.target.value)
     }
+    /**
+     *
+     * @param input
+     */
     const currencyToChange = (input) => {
         setCurrencyTo(input.target.value)
     }
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function submitTransfer(e) {
         e.preventDefault();
         try {
@@ -127,6 +153,11 @@ export default function Account () {
         }
     }
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function submitConvert(e) {
         e.preventDefault();
         try {

@@ -4,6 +4,11 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import Axios from "axios";
 import {useHistory} from "react-router-dom";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Transactions () {
     const [setShowStatement] = useState(false)
     let user = JSON.parse(sessionStorage.getItem("userData"))
@@ -14,6 +19,10 @@ export default function Transactions () {
         history.go(0)
     }
 
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function updateData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: user.personalID})
@@ -25,6 +34,10 @@ export default function Transactions () {
         }
     }
 
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             const token = JSON.parse(sessionStorage.getItem("auth-token"))
@@ -52,6 +65,7 @@ export default function Transactions () {
         history.go(0)
     }
 
+    //checks user is logged in and then updates data when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){

@@ -16,7 +16,7 @@ export default function App() {
         token: undefined,
         user: undefined,
     });
-
+    //checks user is logged in when the page updates
     useEffect(() => {
         const checkLoggedIn = async () => {
             let token = sessionStorage.getItem("auth-token");

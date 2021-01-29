@@ -7,6 +7,11 @@ import UsersLogo from "../images/multiple-users-logo.png";
 import AdminLogo from "../images/admin-logo.png";
 import UserContext from "../../context/UserContext";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function NavigationBar(){
     let userDetails = JSON.parse(sessionStorage.getItem("userData"));
     const history = useHistory();

@@ -10,6 +10,11 @@ import AccountLogo from "../images/account-logo.png";
 import CardLogo from "../images/card-logo.png";
 import UserContext from "../../context/UserContext";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function NavigationBar(){
     let user = JSON.parse(sessionStorage.getItem("userData"));
 

@@ -5,6 +5,11 @@ import Axios from "axios";
 import CardTemplate from "../../images/bank-card-template.png";
 import {useHistory} from "react-router-dom";
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Cards () {
     let user = JSON.parse(sessionStorage.getItem("userData"))
     const history = useHistory();
@@ -18,6 +23,10 @@ export default function Cards () {
     const [frozen, setFrozen] = useState(user.frozenCard)
     const [errorCards, setErrorCards] = useState();
 
+    /**
+     *
+     * @returns {Promise<void>}
+     */
     async function updateData() {
         try {
             const newData = await Axios.post("http://localhost:5000/users/updateData", {PID: user.personalID})
@@ -31,6 +40,11 @@ export default function Cards () {
         }
     }
 
+    /**
+     *
+     *
+     * @returns {Promise<boolean>}
+     */
     async function checkLoggedIn() {
         try {
             if (user.role !== 'user'){
@@ -62,6 +76,7 @@ export default function Cards () {
         history.go(0)
     }
 
+    //checks user is logged in and then updates data when the page updates
     useEffect(() => {
         const logged = checkLoggedIn()
         if (logged === false){
@@ -72,6 +87,11 @@ export default function Cards () {
         updateData();
     }, []);
 
+    /**
+     *
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function submitCards(e) {
         e.preventDefault();
         try {
@@ -83,6 +103,10 @@ export default function Cards () {
         }
     }
 
+    /**
+     *
+     * @returns {string}
+     */
     function randomNum(){
         return String(Math.floor(Math.random() * 10))
     }
