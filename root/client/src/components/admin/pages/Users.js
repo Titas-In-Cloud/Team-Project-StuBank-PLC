@@ -20,7 +20,6 @@ export default function Users () {
     }
     const [allUsers, setAllUsers] = useState([])
     const [personalID, setPersonalID] = useState(undefined);
-    console.log(personalID)
     const [showAmend, setShowAmend] = useState(false);
     const [error, setError] = useState();
     const [email, setEmail] = useState(userDataToAmend.email.data);
@@ -204,7 +203,7 @@ export default function Users () {
                                     <input
                                         className="input-settings"
                                         id="amend-phone-num"
-                                        type="tel"
+                                        type="text"
                                         defaultValue={userDataToAmend.phoneNum.data}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                     />
@@ -215,7 +214,7 @@ export default function Users () {
                                     <input
                                         className="input-settings"
                                         id="amend-email"
-                                        type="email"
+                                        type="text"
                                         defaultValue={userDataToAmend.email.data}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />

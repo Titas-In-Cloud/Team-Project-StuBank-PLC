@@ -13,7 +13,7 @@ export default function Login () {
     const [error, setError] = useState();
     const { setUserData } = useContext(UserContext);
     const history = useHistory();
-
+    sessionStorage.clear()
     const submit = async (e) => {
         e.preventDefault();
         try {
@@ -22,7 +22,6 @@ export default function Login () {
                 "http://localhost:5000/users/login",
                 loginUser
             );
-
 
             if (loginRes.data.user.role === "admin") {
                 setUserData({

@@ -22,7 +22,7 @@ export default function Register () {
     const { setUserData } = useContext(UserContext);
     const role = "user";
     const history = useHistory();
-
+    sessionStorage.clear()
     const submit = async (e) => {
         e.preventDefault();
         try {
@@ -75,7 +75,7 @@ export default function Register () {
 
                             <label htmlFor="register-phone-num"/>
                             <div className="inputBox">
-                                <input type="tel" placeholder="Telephone Number" id="register-phone-num"
+                                <input type="text" placeholder="Telephone Number" id="register-phone-num"
                                        onChange={(e) => setPhoneNum(e.target.value)}
                                 />
                                 <img src={TelephoneLogo} alt=""/>
@@ -83,7 +83,7 @@ export default function Register () {
 
                             <label htmlFor="register-email"/>
                             <div className="inputBox">
-                                <input type="email" placeholder="Email Address" id="register-email"
+                                <input type="text" placeholder="Email Address" id="register-email"
                                        onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <img src={EmailLogo} alt=""/>

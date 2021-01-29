@@ -99,12 +99,15 @@ router.post("/register", async(req, res) => {
         if (existingPID)
             return res.status(400).json({msg: "An account with this personal ID already exists."});
         if (!(phoneNum.match(/^(07\d{8,12}|447\d{7,11})$/))) {
-            return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone number (e.g 07123123123 or 447123123123)"});
+            return res.status(400).json({msg: "Telephone is not valid, please enter a valid phone " +
+                    "number (e.g. 07123123123 or 447123123123)"});
         }
         if (!(email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)))
-            return res.status(400).json({msg: "Email address is not valid, please enter a valid email, e.g. example@email.com"});
+            return res.status(400).json({msg: "Email address is not valid, please enter a valid " +
+                    "email address, e.g. example@email.com"});
         if (!(password.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}$/)))
-            return res.status(400).json({msg: "Password is not valid"});
+            return res.status(400).json({msg: "Password is not valid. It must be between 8 to 15 characters, " +
+                    "have at least 1 number, 1 uppercase and 1 lowercase letter"});
         if (!(personalID.match(/\d{11}$/)))
             return res.status(400).json({msg: "Please enter exactly 11 digits for the personal ID number"});
         //hash password with bcrypt
