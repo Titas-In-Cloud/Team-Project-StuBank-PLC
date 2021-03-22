@@ -31,10 +31,11 @@ export default function FAQ () {
                         </p>
                     </div>
                     <div className="message">
-                        <h1>How do I transfer money</h1>
+                        <h1>How do I transfer money?</h1>
                         <p>
                             Navigate to the account page, and click the transfer button. Choose your payee, the amount
-                            and the currency then click submit. If you entered valid details then you transfer the money
+                            and the currency then click submit. If you entered valid details then the money will be
+                            transferred.
                         </p>
                     </div>
                     <div className="message">
@@ -42,7 +43,7 @@ export default function FAQ () {
                         <p>
                             Navigate to the account page, and click the convert button. Choose the currency you would
                             like to convert to and from and the amount. If you have sufficient funds then the money will
-                            be converted
+                            be converted.
                         </p>
                     </div>
                     <div className="message">
@@ -53,7 +54,7 @@ export default function FAQ () {
                         </p>
                     </div>
                     <div className="message">
-                        <h1>How do change my details</h1>
+                        <h1>How do change my details?</h1>
                         <p>
                             Navigate to the settings page, and click the amend button. Change the details you would
                             like to amend and click submit. Your details will now be updated.
