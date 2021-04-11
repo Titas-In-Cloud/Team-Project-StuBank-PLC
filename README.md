@@ -4,7 +4,7 @@ functionality. It was created during **CSC2033** team software development modul
 
 ### Getting Started
 Start by downloading the required packages. Make sure you are in the **/root** folder of the 
-project and input the command below in the ````Terminal```` to download require packages:
+project and input the command below in the ````Terminal```` to download required packages:
 ````
 npm run build
 ````
@@ -42,13 +42,13 @@ time you will try to login to your account.
 #### Certificate Installation Process
 
 Run the program normally and when it loads there should be a warning about the website being insecure. Click the
-security symbol (normally to the left of the URL) in your browser, and click certificate. On the popup, navigate to the
-details tab and click copy to file. Click next and choose DER encoded binary X.509 (.CER) as the option (should be
-default option). Click next and on the next page click browse, and then type in any name for your certificate and choose
-the download location. Then click save to close the dialog box, and then next and finish. Then open the folder where the
+security symbol (normally to the left of the URL) in your browser, and click *certificate*. On the popup, navigate to the
+details tab and click *copy to file*. Click *next* and choose DER encoded binary X.509 (.CER) as the option (should be
+default option). Click *next* and on the next page click *browse*, and then type in any name for your certificate and choose
+the download location. Then click *save* to close the dialog box, and then *next* and *finish*. Then open the folder where the
 certificate was downloaded, then open it and choose install certificate. Choose current user or local machine depending
-on your preferred installation, and click next. Then choose place all certificates in the following store, and choose
-trusted root certification authorities. Then click next and finish and restart close your browser and restart the
+on your preferred installation, and click *next*. Then choose place all certificates in the following store, and choose
+trusted root certification authorities. Then click *next* and *finish*, close your browser and restart the
 application. The connection will now be secure.
 
 #### User Account Functionality
